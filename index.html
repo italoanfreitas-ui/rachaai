@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Racha Aí - Divisão de Despesas</title>
 <style>
-:root{--primary:#6366f1;--gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--success:#10b981;--danger:#ef4444;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-500:#6b7280;--gray-700:#374151;--gray-900:#111827}*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;color:var(--gray-900);background:linear-gradient(to bottom right,#f9fafb,#e0e7ff);min-height:100vh}.header{background:var(--gradient);position:sticky;top:0;z-index:100;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}.header-content{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;max-width:1400px;margin:0 auto;gap:1rem}.logo{display:flex;align-items:center;gap:.5rem;color:#fff}.logo-icon{width:48px;height:48px}.logo-text{font-size:1.875rem;font-weight:800;color:#fff}.group-select{padding:.5rem 1rem;border:2px solid rgba(255,255,255,.3);border-radius:.5rem;background:rgba(255,255,255,.95);min-width:250px;font-weight:500}.nav{display:flex;background:linear-gradient(to right,rgba(255,255,255,.95),rgba(255,255,255,.98))}.nav-item{flex:1;min-width:100px;display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:1rem;border:none;background:none;color:var(--gray-500);cursor:pointer;border-bottom:3px solid transparent}.nav-item svg{width:24px;height:24px}.nav-item span{font-size:.875rem;font-weight:600}.nav-item:hover{color:var(--primary);background:rgba(99,102,241,.05)}.nav-item.active{color:var(--primary);border-bottom-color:var(--primary)}.main-content{max-width:1400px;margin:0 auto;padding:2rem}.section{display:block}.section.hidden{display:none}.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;gap:1rem;flex-wrap:wrap}.section-header h2{font-size:1.875rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stats-card{background:#fff;border-radius:1rem;padding:1.5rem;margin-bottom:2rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);border:2px solid transparent;background-image:linear-gradient(#fff,#fff),var(--gradient);background-origin:border-box;background-clip:padding-box,border-box}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem}.stat-item{text-align:center}.stat-label{font-size:.875rem;color:var(--gray-500);font-weight:600;text-transform:uppercase}.stat-value{font-size:1.875rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.filter-box{flex:1;max-width:600px;display:flex;gap:.5rem;flex-wrap:wrap}.filter-input{flex:1;min-width:150px;padding:.5rem 1rem;border:2px solid var(--gray-200);border-radius:.5rem}.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.5rem;font-weight:600;border:none;border-radius:.75rem;cursor:pointer}.btn svg{width:20px;height:20px}.btn-primary{background:var(--gradient);color:#fff;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}.btn-secondary{background:#fff;color:var(--gray-700);border:2px solid var(--gray-300)}.btn-small{padding:.25rem .5rem;font-size:.875rem}.btn-small svg{width:16px;height:16px}.btn-danger{background:linear-gradient(135deg,#ee0979 0%,#ff6a00 100%);color:#fff}.card-list{display:grid;gap:1.5rem}@media(min-width:768px){.card-list{grid-template-columns:repeat(auto-fill,minmax(350px,1fr))}}.card{background:#fff;border:1px solid var(--gray-200);border-radius:1rem;padding:1.5rem;box-shadow:0 1px 2px 0 rgba(0,0,0,.05)}.card:hover{transform:translateY(-4px);box-shadow:0 20px 25px -5px rgba(0,0,0,.1)}.card-header{display:flex;justify-content:space-between;margin-bottom:1rem;gap:1rem}.card-title{font-size:1.25rem;font-weight:700}.card-actions{display:flex;gap:.5rem}.card-body{display:flex;flex-direction:column;gap:.5rem}.card-info{display:flex;justify-content:space-between;font-size:.875rem;color:var(--gray-500)}.card-info-label{font-weight:600}.card-info-value{font-weight:700;color:var(--gray-900)}.valor{font-weight:700}.saldo{font-size:1.5rem;font-weight:800}.saldo-positivo{color:var(--success)}.saldo-negativo{color:var(--danger)}.saldo-zero{color:var(--gray-500)}.badge{display:inline-flex;padding:.25rem .5rem;font-size:.75rem;font-weight:700;border-radius:.375rem;text-transform:uppercase}.badge-success{background:linear-gradient(135deg,#0ba360 0%,#3cba92 100%);color:#fff}.badge-danger{background:linear-gradient(135deg,#ee0979 0%,#ff6a00 100%);color:#fff}.badge-neutral{background:var(--gray-200);color:var(--gray-700)}.liquidacao-content{display:flex;flex-direction:column;gap:1.5rem}.liquidacao-item{background:#fff;border:2px solid var(--gray-200);border-radius:1rem;padding:1.5rem;display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:1.5rem;align-items:center}.liquidacao-item:hover{border-color:var(--primary);box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}.liquidacao-number{width:40px;height:40px;border-radius:50%;background:var(--gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.125rem}.liquidacao-person{text-align:center}.liquidacao-person-label{font-size:.75rem;color:var(--gray-500);font-weight:600;text-transform:uppercase}.liquidacao-person-name{font-size:1.125rem;font-weight:700}.liquidacao-arrow{color:var(--primary);font-size:1.875rem;font-weight:700;text-align:center}.liquidacao-valor{text-align:center}.liquidacao-valor-label{font-size:.75rem;color:var(--gray-500);font-weight:600;text-transform:uppercase}.liquidacao-valor-value{font-size:1.5rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem;overflow-y:auto}.modal.active{display:flex}.modal-content{background:#fff;border-radius:1.5rem;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);width:100%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}.modal-large{max-width:800px}.modal-header{display:flex;justify-content:space-between;align-items:center;padding:1.5rem;border-bottom:2px solid var(--gray-100);background:var(--gradient);border-radius:1.5rem 1.5rem 0 0}.modal-header h3{font-size:1.5rem;font-weight:800;color:#fff}.btn-close{background:rgba(255,255,255,.2);border:none;font-size:1.875rem;color:#fff;cursor:pointer;padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%}.btn-close:hover{background:rgba(255,255,255,.3);transform:rotate(90deg)}.modal-body{padding:1.5rem;overflow-y:auto;flex:1}.modal-footer{display:flex;justify-content:flex-end;gap:.5rem;padding:1.5rem;border-top:2px solid var(--gray-100);background:var(--gray-50);border-radius:0 0 1.5rem 1.5rem;flex-shrink:0}.form-group{margin-bottom:1.5rem}.form-group label{display:block;font-weight:600;color:var(--gray-700);margin-bottom:.5rem}.form-group input[type=text],.form-group input[type=number],.form-group input[type=datetime-local],.form-group select{width:100%;padding:.5rem 1rem;border:2px solid var(--gray-200);border-radius:.5rem;font-family:inherit}.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,.1)}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.mode-selector{display:flex;gap:.5rem;margin-bottom:1.5rem;padding:.25rem;background:var(--gray-100);border-radius:.75rem}.mode-btn{flex:1;padding:.5rem;border:2px solid transparent;background:transparent;color:var(--gray-500);border-radius:.5rem;cursor:pointer;font-weight:600;font-size:.875rem}.mode-btn:hover{background:var(--gray-200)}.mode-btn.active{background:#fff;color:var(--primary);border-color:var(--primary);box-shadow:0 1px 2px 0 rgba(0,0,0,.05)}.participantes-list{display:flex;flex-direction:column;gap:.5rem}.participante-item{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:.5rem;border:2px solid var(--gray-200);border-radius:.5rem;background:#fff}.participante-item input[type=number]{width:120px;padding:.25rem .5rem;border:2px solid var(--gray-200);border-radius:.25rem;text-align:right}.empty-state{text-align:center;padding:3rem;color:var(--gray-500);font-size:1.125rem;background:#fff;border-radius:1rem;border:2px dashed var(--gray-300)}.hidden{display:none!important}.print-area{display:none}@media print{body>*:not(#printArea){display:none!important}.print-area{display:block!important;padding:20px;color:#000;background:#fff}@page{margin:1.5cm;size:A4}.print-header{text-align:center;margin-bottom:40px;padding:30px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:12px}.print-logo{font-size:32pt;font-weight:bold;margin-bottom:10px}.print-title{font-size:20pt;font-weight:600;margin-bottom:10px}.print-info{font-size:10pt}.print-stats{background:linear-gradient(135deg,#f9fafb 0%,#e0e7ff 100%);padding:20px;border-radius:12px;margin-bottom:30px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.print-stat{text-align:center}.print-stat-label{font-size:9pt;color:#666;text-transform:uppercase;margin-bottom:5px}.print-stat-value{font-size:16pt;font-weight:bold;color:#4f46e5}.print-section{margin-bottom:30px}.print-section-title{font-size:16pt;font-weight:bold;margin-bottom:15px;color:#4f46e5;border-bottom:3px solid #4f46e5;padding-bottom:8px}.print-item{padding:15px;margin-bottom:10px;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb}.print-item-title{font-size:12pt;font-weight:bold;margin-bottom:8px}.print-item-detail{font-size:10pt;margin-bottom:4px;display:flex;justify-content:space-between}.print-item-label{font-weight:600;color:#666}.print-balance-card{padding:15px;margin-bottom:10px;border:2px solid #e5e7eb;border-radius:8px;background:#fff}.print-balance-name{font-size:13pt;font-weight:bold;margin-bottom:10px}.print-balance-final{margin-top:10px;padding-top:10px;border-top:2px solid #e5e7eb;font-size:12pt;font-weight:bold;display:flex;justify-content:space-between}.print-settlement{padding:15px;margin-bottom:12px;border:2px solid #4f46e5;border-radius:8px;background:linear-gradient(to right,#f9fafb,#fff);display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:15px;align-items:center}.print-settlement-number{width:30px;height:30px;background:#4f46e5;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11pt}.print-settlement-person{text-align:center}.print-settlement-label{font-size:8pt;color:#666;text-transform:uppercase}.print-settlement-name{font-size:11pt;font-weight:bold}.print-settlement-arrow{font-size:18pt;color:#4f46e5;text-align:center}.print-settlement-value{text-align:center}.print-settlement-amount{font-size:13pt;font-weight:bold;color:#4f46e5}.print-balance-positive{color:#10b981}.print-balance-negative{color:#ef4444}.print-balance-zero{color:#6b7280}}
+:root{--primary:#6366f1;--gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--success:#10b981;--danger:#ef4444;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-500:#6b7280;--gray-700:#374151;--gray-900:#111827}*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;color:var(--gray-900);background:linear-gradient(to bottom right,#f9fafb,#e0e7ff);min-height:100vh}.header{background:var(--gradient);position:sticky;top:0;z-index:100;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}.header-content{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;max-width:1400px;margin:0 auto;gap:1rem}.logo{display:flex;align-items:center;gap:.5rem;color:#fff}.logo-icon{width:48px;height:48px}.logo-text{font-size:1.875rem;font-weight:800;color:#fff}.group-select{padding:.5rem 1rem;border:2px solid rgba(255,255,255,.3);border-radius:.5rem;background:rgba(255,255,255,.95);min-width:250px;font-weight:500}.nav{display:flex;background:linear-gradient(to right,rgba(255,255,255,.95),rgba(255,255,255,.98))}.nav-item{flex:1;min-width:100px;display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:1rem;border:none;background:none;color:var(--gray-500);cursor:pointer;border-bottom:3px solid transparent}.nav-item svg{width:24px;height:24px}.nav-item span{font-size:.875rem;font-weight:600}.nav-item:hover{color:var(--primary);background:rgba(99,102,241,.05)}.nav-item.active{color:var(--primary);border-bottom-color:var(--primary)}.main-content{max-width:1400px;margin:0 auto;padding:2rem}.section{display:block}.section.hidden{display:none}.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;gap:1rem;flex-wrap:wrap}.section-header h2{font-size:1.875rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stats-card{background:#fff;border-radius:1rem;padding:1.5rem;margin-bottom:2rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.1);border:2px solid transparent;background-image:linear-gradient(#fff,#fff),var(--gradient);background-origin:border-box;background-clip:padding-box,border-box}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem}.stat-item{text-align:center}.stat-label{font-size:.875rem;color:var(--gray-500);font-weight:600;text-transform:uppercase}.stat-value{font-size:1.875rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.filter-box{flex:1;max-width:600px;display:flex;gap:.5rem;flex-wrap:wrap}.filter-input{flex:1;min-width:150px;padding:.5rem 1rem;border:2px solid var(--gray-200);border-radius:.5rem}.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.5rem;font-weight:600;border:none;border-radius:.75rem;cursor:pointer}.btn svg{width:20px;height:20px}.btn-primary{background:var(--gradient);color:#fff;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}.btn-secondary{background:#fff;color:var(--gray-700);border:2px solid var(--gray-300)}.btn-small{padding:.25rem .5rem;font-size:.875rem}.btn-small svg{width:16px;height:16px}.btn-danger{background:linear-gradient(135deg,#ee0979 0%,#ff6a00 100%);color:#fff}.card-list{display:grid;gap:1.5rem}@media(min-width:768px){.card-list{grid-template-columns:repeat(auto-fill,minmax(350px,1fr))}}.card{background:#fff;border:1px solid var(--gray-200);border-radius:1rem;padding:1.5rem;box-shadow:0 1px 2px 0 rgba(0,0,0,.05)}.card:hover{transform:translateY(-4px);box-shadow:0 20px 25px -5px rgba(0,0,0,.1)}.card-header{display:flex;justify-content:space-between;margin-bottom:1rem;gap:1rem}.card-title{font-size:1.25rem;font-weight:700}.card-actions{display:flex;gap:.5rem}.card-body{display:flex;flex-direction:column;gap:.5rem}.card-info{display:flex;justify-content:space-between;font-size:.875rem;color:var(--gray-500)}.card-info-label{font-weight:600}.card-info-value{font-weight:700;color:var(--gray-900)}.valor{font-weight:700}.saldo{font-size:1.5rem;font-weight:800}.saldo-positivo{color:var(--success)}.saldo-negativo{color:var(--danger)}.saldo-zero{color:var(--gray-500)}.badge{display:inline-flex;align-items:center;padding:.25rem .5rem;font-size:.75rem;font-weight:700;border-radius:.375rem;text-transform:uppercase;line-height:1}.badge-success{background:linear-gradient(135deg,#0ba360 0%,#3cba92 100%);color:#fff}.badge-danger{background:linear-gradient(135deg,#ee0979 0%,#ff6a00 100%);color:#fff}.badge-neutral{background:var(--gray-200);color:var(--gray-700)}.liquidacao-content{display:flex;flex-direction:column;gap:1.5rem}.liquidacao-item{background:#fff;border:2px solid var(--gray-200);border-radius:1rem;padding:1.5rem;display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:1.5rem;align-items:center}.liquidacao-item:hover{border-color:var(--primary);box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}.liquidacao-number{width:40px;height:40px;border-radius:50%;background:var(--gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.125rem}.liquidacao-person{text-align:center}.liquidacao-person-label{font-size:.75rem;color:var(--gray-500);font-weight:600;text-transform:uppercase}.liquidacao-person-name{font-size:1.125rem;font-weight:700}.liquidacao-arrow{color:var(--primary);font-size:1.875rem;font-weight:700;text-align:center}.liquidacao-valor{text-align:center}.liquidacao-valor-label{font-size:.75rem;color:var(--gray-500);font-weight:600;text-transform:uppercase}.liquidacao-valor-value{font-size:1.5rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem;overflow-y:auto}.modal.active{display:flex}.modal-content{background:#fff;border-radius:1.5rem;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);width:100%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}.modal-large{max-width:800px}.modal-header{display:flex;justify-content:space-between;align-items:center;padding:1.5rem;border-bottom:2px solid var(--gray-100);background:var(--gradient);border-radius:1.5rem 1.5rem 0 0}.modal-header h3{font-size:1.5rem;font-weight:800;color:#fff}.btn-close{background:rgba(255,255,255,.2);border:none;font-size:1.875rem;color:#fff;cursor:pointer;padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%}.btn-close:hover{background:rgba(255,255,255,.3);transform:rotate(90deg)}.modal-body{padding:1.5rem;overflow-y:auto;flex:1}.modal-footer{display:flex;justify-content:flex-end;gap:.5rem;padding:1.5rem;border-top:2px solid var(--gray-100);background:var(--gray-50);border-radius:0 0 1.5rem 1.5rem;flex-shrink:0}.form-group{margin-bottom:1.5rem}.form-group label{display:block;font-weight:600;color:var(--gray-700);margin-bottom:.5rem}.form-group input[type=text],.form-group input[type=number],.form-group input[type=datetime-local],.form-group select{width:100%;padding:.5rem 1rem;border:2px solid var(--gray-200);border-radius:.5rem;font-family:inherit}.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,.1)}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.mode-selector{display:flex;gap:.5rem;margin-bottom:1.5rem;padding:.25rem;background:var(--gray-100);border-radius:.75rem}.mode-btn{flex:1;padding:.5rem;border:2px solid transparent;background:transparent;color:var(--gray-500);border-radius:.5rem;cursor:pointer;font-weight:600;font-size:.875rem}.mode-btn:hover{background:var(--gray-200)}.mode-btn.active{background:#fff;color:var(--primary);border-color:var(--primary);box-shadow:0 1px 2px 0 rgba(0,0,0,.05)}.participantes-list{display:flex;flex-direction:column;gap:.5rem}.participante-item{display:flex;align-items:center;gap:1rem;padding:.5rem;border:2px solid var(--gray-200);border-radius:.5rem;background:#fff}.participante-item input[type=number]{padding:.25rem .5rem;border:2px solid var(--gray-200);border-radius:.25rem;text-align:right}.empty-state{text-align:center;padding:3rem;color:var(--gray-500);font-size:1.125rem;background:#fff;border-radius:1rem;border:2px dashed var(--gray-300)}.hidden{display:none!important}.print-area{display:none}@media print{body>*:not(#printArea){display:none!important}.print-area{display:block!important;padding:20px;color:#000;background:#fff}@page{margin:1.5cm;size:A4}.print-header{text-align:center;margin-bottom:40px;padding:30px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:12px}.print-logo{font-size:32pt;font-weight:bold;margin-bottom:10px}.print-title{font-size:20pt;font-weight:600;margin-bottom:10px}.print-info{font-size:10pt}.print-stats{background:linear-gradient(135deg,#f9fafb 0%,#e0e7ff 100%);padding:20px;border-radius:12px;margin-bottom:30px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.print-stat{text-align:center}.print-stat-label{font-size:9pt;color:#666;text-transform:uppercase;margin-bottom:5px}.print-stat-value{font-size:16pt;font-weight:bold;color:#4f46e5}.print-section{margin-bottom:30px}.print-section-title{font-size:16pt;font-weight:bold;margin-bottom:15px;color:#4f46e5;border-bottom:3px solid #4f46e5;padding-bottom:8px}.print-item{padding:15px;margin-bottom:10px;border:2px solid #e5e7eb;border-radius:8px;background:#f9fafb}.print-item-title{font-size:12pt;font-weight:bold;margin-bottom:8px}.print-item-detail{font-size:10pt;margin-bottom:4px;display:flex;justify-content:space-between}.print-item-label{font-weight:600;color:#666}.print-balance-card{padding:15px;margin-bottom:10px;border:2px solid #e5e7eb;border-radius:8px;background:#fff}.print-balance-name{font-size:13pt;font-weight:bold;margin-bottom:10px}.print-balance-final{margin-top:10px;padding-top:10px;border-top:2px solid #e5e7eb;font-size:12pt;font-weight:bold;display:flex;justify-content:space-between}.print-settlement{padding:15px;margin-bottom:12px;border:2px solid #4f46e5;border-radius:8px;background:linear-gradient(to right,#f9fafb,#fff);display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:15px;align-items:center}.print-settlement-number{width:30px;height:30px;background:#4f46e5;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11pt}.print-settlement-person{text-align:center}.print-settlement-label{font-size:8pt;color:#666;text-transform:uppercase}.print-settlement-name{font-size:11pt;font-weight:bold}.print-settlement-arrow{font-size:18pt;color:#4f46e5;text-align:center}.print-settlement-value{text-align:center}.print-settlement-amount{font-size:13pt;font-weight:bold;color:#4f46e5}.print-balance-positive{color:#10b981}.print-balance-negative{color:#ef4444}.print-balance-zero{color:#6b7280}}
 </style>
 </head>
 <body>
@@ -143,6 +143,7 @@
             <div class="section-header">
                 <h2>Resumo de Saldos</h2>
             </div>
+            <div id="statsBar" style="display:none"></div>
             <div class="empty-state" id="emptyStateResumo">
                 <p>Nenhuma despesa lançada ainda</p>
             </div>
@@ -311,6 +312,22 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" id="btnFecharDetalhamento">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para explicação de liquidação -->
+    <div class="modal" id="modalExplicacaoLiquidacao">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalExplicacaoTitulo">Detalhamento da Transação</h3>
+                <button class="btn-close" id="btnFecharModalExplicacao">&times;</button>
+            </div>
+            <div class="modal-body" id="modalExplicacaoConteudo">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnFecharExplicacao">Fechar</button>
             </div>
         </div>
     </div>
@@ -653,7 +670,9 @@ const Calculos = {
                 if (valor > 0.01) { // Ignora valores muito pequenos
                     transacoes.push({
                         de: devedor.nome,
+                        deId: devedorId,
                         para: credor.nome,
+                        paraId: credorId,
                         valor: valor
                     });
                 }
@@ -707,7 +726,9 @@ const Calculos = {
             if (valorTransferencia > 0.01) {
                 transacoes.push({
                     de: devedor.nome,
+                    deId: devedor.id,
                     para: credor.nome,
+                    paraId: credor.id,
                     valor: valorTransferencia
                 });
             }
@@ -965,6 +986,10 @@ const UI = {
         // Modais - Detalhamento
         document.getElementById('btnFecharModalDetalhamento').addEventListener('click', () => this.fecharModalDetalhamento());
         document.getElementById('btnFecharDetalhamento').addEventListener('click', () => this.fecharModalDetalhamento());
+
+        // Modais - Explicação Liquidação
+        document.getElementById('btnFecharModalExplicacao').addEventListener('click', () => this.fecharModalExplicacaoLiquidacao());
+        document.getElementById('btnFecharExplicacao').addEventListener('click', () => this.fecharModalExplicacaoLiquidacao());
 
         // Filtros de despesas
         document.getElementById('filtroDescricao').addEventListener('input', () => this.renderizarDespesas());
@@ -1342,9 +1367,11 @@ const UI = {
     renderizarResumo() {
         const container = document.getElementById('listaResumo');
         const emptyState = document.getElementById('emptyStateResumo');
+        const statsBar = document.getElementById('statsBar');
 
         if (!AppState.grupoAtivo || AppState.grupoAtivo.despesas.length === 0) {
             container.innerHTML = '';
+            statsBar.style.display = 'none';
             emptyState.style.display = 'block';
             return;
         }
@@ -1358,26 +1385,25 @@ const UI = {
         const totalDespesas = AppState.grupoAtivo.despesas.reduce((sum, d) => sum + d.valor, 0);
         const numDespesas = AppState.grupoAtivo.despesas.length;
 
-        // Card de estatísticas
-        const statsCard = document.createElement('div');
-        statsCard.className = 'stats-card';
-        statsCard.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-label">Total de Despesas</div>
-                    <div class="stat-value">${Utils.formatarMoeda(totalDespesas)}</div>
+        // Faixa de estatísticas
+        statsBar.style.display = 'block';
+        statsBar.style.cssText = 'display:block;background:#fff;border-radius:0.75rem;padding:1rem 1.5rem;margin-bottom:2rem;box-shadow:0 2px 4px rgba(0,0,0,.05);border-left:4px solid var(--primary)';
+        statsBar.innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;align-items:center">
+                <div>
+                    <div style="font-size:0.75rem;color:var(--gray-500);font-weight:600;text-transform:uppercase;margin-bottom:0.25rem">Total de Despesas</div>
+                    <div style="font-size:1.5rem;font-weight:800;color:var(--primary)">${Utils.formatarMoeda(totalDespesas)}</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">Número de Despesas</div>
-                    <div class="stat-value">${numDespesas}</div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--gray-500);font-weight:600;text-transform:uppercase;margin-bottom:0.25rem">Número de Despesas</div>
+                    <div style="font-size:1.5rem;font-weight:800;color:var(--gray-900)">${numDespesas}</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-label">Média por Despesa</div>
-                    <div class="stat-value">${numDespesas > 0 ? Utils.formatarMoeda(totalDespesas / numDespesas) : 'R$ 0,00'}</div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--gray-500);font-weight:600;text-transform:uppercase;margin-bottom:0.25rem">Média por Despesa</div>
+                    <div style="font-size:1.5rem;font-weight:800;color:var(--gray-700)">${numDespesas > 0 ? Utils.formatarMoeda(totalDespesas / numDespesas) : 'R$ 0,00'}</div>
                 </div>
             </div>
         `;
-        container.appendChild(statsCard);
 
         Object.entries(saldos).forEach(([membroId, saldo]) => {
             const saldoClass = saldo.saldo > 0.01 ? 'saldo-positivo' : saldo.saldo < -0.01 ? 'saldo-negativo' : 'saldo-zero';
@@ -1479,6 +1505,7 @@ const UI = {
         transacoes.forEach((transacao, index) => {
             const item = document.createElement('div');
             item.className = 'liquidacao-item';
+            item.style.cursor = 'pointer';
             item.innerHTML = `
                 <div style="flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background-color: var(--color-gray-100); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-gray-600);">
                     ${index + 1}
@@ -1497,6 +1524,9 @@ const UI = {
                     <div class="liquidacao-valor">${Utils.formatarMoeda(transacao.valor)}</div>
                 </div>
             `;
+            item.addEventListener('click', () => {
+                this.abrirModalExplicacaoLiquidacao(transacao.deId, transacao.paraId, transacao.valor);
+            });
             container.appendChild(item);
         });
     },
@@ -2073,6 +2103,188 @@ const UI = {
         document.getElementById('modalDetalhamento').classList.remove('active');
     },
 
+    abrirModalExplicacaoLiquidacao(devedorId, credorId, valorTotal) {
+        if (!AppState.grupoAtivo) return;
+
+        const devedor = AppState.grupoAtivo.membros.find(m => m.id === devedorId);
+        const credor = AppState.grupoAtivo.membros.find(m => m.id === credorId);
+
+        if (!devedor || !credor) return;
+
+        const modal = document.getElementById('modalExplicacaoLiquidacao');
+        const titulo = document.getElementById('modalExplicacaoTitulo');
+        const conteudo = document.getElementById('modalExplicacaoConteudo');
+
+        titulo.textContent = 'Por que esse pagamento?';
+
+        let html = `
+            <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+                <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem;">💸 Transação</div>
+                <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    ${devedor.nome} → ${credor.nome}
+                </div>
+                <div style="font-size: 2rem; font-weight: 800; opacity: 0.95;">
+                    ${Utils.formatarMoeda(valorTotal)}
+                </div>
+            </div>
+        `;
+
+        if (AppState.grupoAtivo.reducaoTransacoes) {
+            // Modo reduzido - explicação geral
+            html += `
+                <div style="background: var(--gray-50); border-left: 4px solid var(--primary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem; color: var(--gray-900);">ℹ️ Modo de Redução Ativo</div>
+                    <p style="color: var(--gray-700); margin: 0; line-height: 1.6;">
+                        Este pagamento faz parte de uma otimização para minimizar o número total de transações.
+                        O valor pode não corresponder diretamente a uma despesa específica, mas garante que todos
+                        os saldos finais sejam quitados corretamente.
+                    </p>
+                </div>
+            `;
+
+            // Mostra saldos finais
+            const saldos = Calculos.calcularSaldos(AppState.grupoAtivo);
+            const saldoDevedor = saldos[devedorId];
+            const saldoCredor = saldos[credorId];
+
+            html += `
+                <div style="margin-top: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem; color: var(--gray-700); font-size: 1rem;">📊 Saldos Gerais</h4>
+                    <div style="display: grid; gap: 0.75rem;">
+                        <div style="background: #fff; border: 2px solid var(--gray-200); border-radius: 0.5rem; padding: 1rem;">
+                            <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.25rem;">${devedor.nome}</div>
+                            <div style="font-weight: 700; color: ${saldoDevedor.saldo < 0 ? 'var(--danger)' : 'var(--success)'};">
+                                Saldo: ${Utils.formatarMoeda(saldoDevedor.saldo)}
+                            </div>
+                        </div>
+                        <div style="background: #fff; border: 2px solid var(--gray-200); border-radius: 0.5rem; padding: 1rem;">
+                            <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.25rem;">${credor.nome}</div>
+                            <div style="font-weight: 700; color: ${saldoCredor.saldo < 0 ? 'var(--danger)' : 'var(--success)'};">
+                                Saldo: ${Utils.formatarMoeda(saldoCredor.saldo)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Modo não-reduzido - mostra despesas específicas
+            html += `
+                <div style="background: var(--gray-50); border-left: 4px solid var(--success); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem; color: var(--gray-900);">ℹ️ Modo Direto Ativo</div>
+                    <p style="color: var(--gray-700); margin: 0; line-height: 1.6;">
+                        Este pagamento representa a soma das despesas pagas por ${credor.nome} onde ${devedor.nome} participou.
+                    </p>
+                </div>
+            `;
+
+            // Encontra despesas relevantes
+            const despesasRelevantes = [];
+            AppState.grupoAtivo.despesas.forEach(despesa => {
+                if (despesa.pagadorId !== credorId) return; // Credor deve ter pagado
+
+                const modoDivisao = despesa.modoDivisao || 'igual';
+                let devedorParticipou = false;
+                let valorDevido = 0;
+
+                if (modoDivisao === 'igual') {
+                    const participantes = Array.isArray(despesa.participantes)
+                        ? despesa.participantes
+                        : Object.keys(despesa.participantes);
+                    devedorParticipou = participantes.includes(devedorId);
+                    if (devedorParticipou && devedorId !== credorId) {
+                        valorDevido = despesa.valor / participantes.length;
+                    }
+                } else if (modoDivisao === 'partes') {
+                    const participantes = despesa.participantes;
+                    devedorParticipou = participantes.hasOwnProperty(devedorId);
+                    if (devedorParticipou && devedorId !== credorId) {
+                        const totalPartes = Object.values(participantes).reduce((sum, p) => sum + p, 0);
+                        const partesDevedor = participantes[devedorId];
+                        valorDevido = (partesDevedor / totalPartes) * despesa.valor;
+                    }
+                } else if (modoDivisao === 'valor') {
+                    const participantes = despesa.participantes;
+                    devedorParticipou = participantes.hasOwnProperty(devedorId);
+                    if (devedorParticipou && devedorId !== credorId) {
+                        valorDevido = participantes[devedorId];
+                    }
+                }
+
+                if (devedorParticipou && valorDevido > 0) {
+                    despesasRelevantes.push({
+                        descricao: despesa.descricao,
+                        valorTotal: despesa.valor,
+                        valorDevido: valorDevido,
+                        timestamp: despesa.timestamp,
+                        modoDivisao: modoDivisao
+                    });
+                }
+            });
+
+            html += `
+                <div>
+                    <h4 style="margin-bottom: 1rem; color: var(--gray-700); font-size: 1rem;">
+                        📋 Despesas Incluídas (${despesasRelevantes.length})
+                    </h4>
+            `;
+
+            if (despesasRelevantes.length === 0) {
+                html += '<p style="color: var(--gray-500); font-style: italic;">Nenhuma despesa encontrada.</p>';
+            } else {
+                despesasRelevantes.forEach(desp => {
+                    const modoDivisaoLabel = {
+                        'igual': 'Divisão Igual',
+                        'partes': 'Por Partes',
+                        'valor': 'Por Valor'
+                    }[desp.modoDivisao];
+
+                    html += `
+                        <div style="background: #fff; border: 2px solid var(--gray-200); border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <div style="font-weight: 700; color: var(--gray-900);">${desp.descricao}</div>
+                                <div style="background: var(--primary); color: white; padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 600;">
+                                    ${modoDivisaoLabel}
+                                </div>
+                            </div>
+                            <div style="display: grid; gap: 0.25rem; font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.75rem;">
+                                <div>💰 Valor total: ${Utils.formatarMoeda(desp.valorTotal)}</div>
+                                <div>📅 ${Utils.formatarData(desp.timestamp)}</div>
+                            </div>
+                            <div style="border-top: 2px solid var(--gray-200); padding-top: 0.75rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.875rem; color: var(--gray-600);">Sua parte:</span>
+                                    <span style="font-size: 1.25rem; font-weight: 700; color: var(--danger);">
+                                        ${Utils.formatarMoeda(desp.valorDevido)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Total
+                const totalCalculado = despesasRelevantes.reduce((sum, d) => sum + d.valorDevido, 0);
+                html += `
+                    <div style="background: linear-gradient(135deg, var(--danger) 0%, #e53e3e 100%); color: white; padding: 1rem; border-radius: 0.75rem; margin-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 1rem; font-weight: 600;">TOTAL A PAGAR</span>
+                            <span style="font-size: 1.5rem; font-weight: 800;">${Utils.formatarMoeda(totalCalculado)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+        }
+
+        conteudo.innerHTML = html;
+        modal.classList.add('active');
+    },
+
+    fecharModalExplicacaoLiquidacao() {
+        document.getElementById('modalExplicacaoLiquidacao').classList.remove('active');
+    },
+
     // ============================================
     // Modo de Divisão
     // ============================================
@@ -2103,7 +2315,11 @@ const UI = {
         const checkboxesAntigos = container.querySelectorAll('input[type="checkbox"]');
         const valoresAntigos = {};
 
-        // Salva estados dos checkboxes e valores antes de re-renderizar
+        // Detecta o modo anterior
+        const modoAnterior = container.dataset.modoAtual;
+        container.dataset.modoAtual = modo;
+
+        // Salva estados dos checkboxes e valores apenas se o modo for o mesmo
         checkboxesAntigos.forEach(cb => {
             const membroId = cb.value;
             valoresAntigos[membroId] = {
@@ -2111,7 +2327,8 @@ const UI = {
                 valor: null
             };
 
-            if (modo !== 'igual') {
+            // Só preserva valores se estiver no mesmo modo
+            if (modoAnterior === modo && modo !== 'igual') {
                 const input = cb.parentElement.querySelector('input[type="number"]');
                 if (input) {
                     valoresAntigos[membroId].valor = input.value;
@@ -2126,14 +2343,14 @@ const UI = {
             item.className = 'participante-item';
 
             if (modo === 'igual') {
-                // Modo Igualitária: apenas checkbox + prévia
+                // Modo Igualitária: checkbox + nome + prévia
                 item.innerHTML = `
                     <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
                     <span style="flex: 1;">${membro.nome}</span>
                     <span class="previa-valor" data-membro="${membro.id}" style="font-size: 0.875rem; color: var(--gray-500); font-weight: 600;">-</span>
                 `;
             } else if (modo === 'partes') {
-                // Modo Por Partes: checkbox + input de partes + prévia
+                // Modo Por Partes: checkbox + nome + input partes + prévia (mesma linha)
                 item.innerHTML = `
                     <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
                     <span style="flex: 1;">${membro.nome}</span>
@@ -2144,14 +2361,13 @@ const UI = {
                            min="0.1"
                            placeholder="Partes"
                            value="${valoresAntigos[membro.id]?.valor || '1'}"
-                           ${!valoresAntigos[membro.id]?.checked ? 'disabled' : ''}>
-                    <span class="previa-valor" data-membro="${membro.id}" style="font-size: 0.875rem; color: var(--gray-500); font-weight: 600; margin-left: 0.5rem;">-</span>
+                           ${!valoresAntigos[membro.id]?.checked ? 'disabled' : ''}
+                           style="width:80px">
+                    <span class="previa-valor" data-membro="${membro.id}" style="font-size: 0.875rem; color: var(--gray-500); font-weight: 600;">-</span>
                 `;
             } else if (modo === 'valor') {
-                // Modo Por Valor: checkbox + input de valor fixo (que será a prévia)
-                const valorDefault = valoresAntigos[membro.id]?.valor !== null && valoresAntigos[membro.id]?.valor !== undefined && valoresAntigos[membro.id]?.valor !== ''
-                    ? valoresAntigos[membro.id].valor
-                    : '';
+                // Modo Por Valor: checkbox + nome + input valor (que já mostra a prévia)
+                const valorDefault = valoresAntigos[membro.id]?.valor || '';
                 item.innerHTML = `
                     <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
                     <span style="flex: 1;">${membro.nome}</span>
@@ -2162,7 +2378,8 @@ const UI = {
                            min="0.01"
                            placeholder="Valor (R$)"
                            value="${valorDefault}"
-                           ${!valoresAntigos[membro.id]?.checked ? 'disabled' : ''}>
+                           ${!valoresAntigos[membro.id]?.checked ? 'disabled' : ''}
+                           style="width:120px">
                 `;
             }
 
