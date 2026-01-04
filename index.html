@@ -975,12 +975,20 @@ const UI = {
         document.getElementById('btnSelecionarTodos').addEventListener('click', () => {
             document.querySelectorAll('#checkboxParticipantes input[type="checkbox"]').forEach(cb => {
                 cb.checked = true;
+                // Habilita inputs quando marca checkbox
+                const input = cb.parentElement.querySelector('input[type="number"]');
+                if (input) input.disabled = false;
             });
+            this.atualizarPreviaValores();
         });
         document.getElementById('btnSelecionarNenhum').addEventListener('click', () => {
             document.querySelectorAll('#checkboxParticipantes input[type="checkbox"]').forEach(cb => {
                 cb.checked = false;
+                // Desabilita inputs quando desmarca checkbox
+                const input = cb.parentElement.querySelector('input[type="number"]');
+                if (input) input.disabled = true;
             });
+            this.atualizarPreviaValores();
         });
 
         // Modais - Detalhamento
@@ -1797,6 +1805,8 @@ const UI = {
                         });
                     }
                 }
+                // Atualiza preview após carregar valores
+                this.atualizarPreviaValores();
             }, 50);
         }
 
@@ -1830,14 +1840,46 @@ const UI = {
         if (modoDivisao === 'igual') {
             // Modo igual: array simples de IDs
             participantes = Array.from(checkboxes).map(cb => cb.value);
-        } else {
-            // Modos partes/valor: objeto com ID e valor
+        } else if (modoDivisao === 'partes') {
+            // Modo partes: objeto com ID e valor
             participantes = {};
             checkboxes.forEach(cb => {
                 const membroId = cb.value;
                 const input = cb.parentElement.querySelector('input[type="number"]');
-                const valorInput = input ? parseFloat(input.value) : (modoDivisao === 'partes' ? 1 : null);
+                const valorInput = input ? parseFloat(input.value) : 1;
                 participantes[membroId] = valorInput;
+            });
+        } else if (modoDivisao === 'valor') {
+            // Modo valor: objeto com ID e valor (permite vazios)
+            participantes = {};
+            const participantesComValor = [];
+            const participantesSemValor = [];
+
+            checkboxes.forEach(cb => {
+                const membroId = cb.value;
+                const input = cb.parentElement.querySelector('input[type="number"]');
+                const valorInput = input ? parseFloat(input.value) : null;
+
+                if (!isNaN(valorInput) && valorInput > 0) {
+                    participantesComValor.push({ id: membroId, valor: valorInput });
+                } else {
+                    participantesSemValor.push(membroId);
+                }
+            });
+
+            // Calcula remanescente
+            const somaPersonalizados = participantesComValor.reduce((sum, p) => sum + p.valor, 0);
+            const remanescente = valor - somaPersonalizados;
+            const valorRemanescente = participantesSemValor.length > 0
+                ? remanescente / participantesSemValor.length
+                : 0;
+
+            // Atribui valores
+            participantesComValor.forEach(p => {
+                participantes[p.id] = p.valor;
+            });
+            participantesSemValor.forEach(id => {
+                participantes[id] = valorRemanescente;
             });
         }
 
@@ -1874,16 +1916,20 @@ const UI = {
                 return;
             }
         } else if (modoDivisao === 'valor') {
-            const valoresInvalidos = Object.values(participantes).some(v => !v || v <= 0);
-            if (valoresInvalidos) {
-                Utils.notificar('Por favor, informe um valor válido para todos os participantes.');
-                return;
-            }
+            // Verifica se há ao menos um participante (já garantido acima)
+            // Verifica se a soma dos valores personalizados não excede o total
+            let somaPersonalizados = 0;
+            checkboxes.forEach(cb => {
+                const membroId = cb.value;
+                const input = cb.parentElement.querySelector('input[type="number"]');
+                const valorInput = input ? parseFloat(input.value) : null;
+                if (!isNaN(valorInput) && valorInput > 0) {
+                    somaPersonalizados += valorInput;
+                }
+            });
 
-            // Verifica se a soma dos valores não excede o total
-            const somaValores = Object.values(participantes).reduce((sum, v) => sum + v, 0);
-            if (somaValores > valor) {
-                Utils.notificar(`A soma dos valores individuais (${Utils.formatarMoeda(somaValores)}) não pode ser maior que o valor total (${Utils.formatarMoeda(valor)}).`);
+            if (somaPersonalizados > valor) {
+                Utils.notificar(`A soma dos valores personalizados (${Utils.formatarMoeda(somaPersonalizados)}) não pode ser maior que o valor total (${Utils.formatarMoeda(valor)}).`);
                 return;
             }
         }
@@ -2473,6 +2519,67 @@ const UI = {
                 } else {
                     span.textContent = '-';
                     span.style.color = 'var(--gray-500)';
+                }
+            });
+        } else if (modo === 'valor') {
+            // Modo "por valor": valores personalizados têm prioridade,
+            // remanescente é dividido entre quem não tem valor definido
+            let somaPersonalizados = 0;
+            const valoresPorMembro = {};
+            const participantesSemValor = [];
+
+            checkboxes.forEach(cb => {
+                const membroId = cb.value;
+                const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
+                const valorPersonalizado = parseFloat(input?.value);
+
+                if (!isNaN(valorPersonalizado) && valorPersonalizado > 0) {
+                    // Tem valor personalizado
+                    valoresPorMembro[membroId] = valorPersonalizado;
+                    somaPersonalizados += valorPersonalizado;
+                } else {
+                    // Sem valor personalizado - receberá parte do remanescente
+                    participantesSemValor.push(membroId);
+                }
+            });
+
+            // Calcula remanescente
+            const remanescente = valorTotal - somaPersonalizados;
+            const valorRemanescente = participantesSemValor.length > 0
+                ? remanescente / participantesSemValor.length
+                : 0;
+
+            // Atualiza preview nos inputs
+            checkboxes.forEach(cb => {
+                const membroId = cb.value;
+                const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
+
+                if (valoresPorMembro[membroId]) {
+                    // Tem valor personalizado - apenas atualiza estilo
+                    input.style.color = 'var(--gray-900)';
+                    input.style.fontWeight = '600';
+                } else {
+                    // Sem valor - mostra o placeholder com o valor remanescente
+                    if (valorRemanescente > 0) {
+                        input.placeholder = Utils.formatarMoeda(valorRemanescente);
+                        input.style.color = 'var(--gray-600)';
+                        input.style.fontWeight = '400';
+                    } else {
+                        input.placeholder = 'Valor';
+                        input.style.color = 'var(--gray-600)';
+                        input.style.fontWeight = '400';
+                    }
+                }
+            });
+
+            // Atualiza inputs não marcados
+            document.querySelectorAll('input[name="participante"]:not(:checked)').forEach(cb => {
+                const membroId = cb.value;
+                const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
+                if (input) {
+                    input.placeholder = 'Valor';
+                    input.style.color = 'var(--gray-600)';
+                    input.style.fontWeight = '400';
                 }
             });
         }
