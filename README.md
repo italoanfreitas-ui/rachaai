@@ -1,243 +1,239 @@
 # Racha Aí 💰
 
-WebAplicativo moderno de divisão de despesas em grupo, inspirado no Settle Up.
+**WebAplicativo 100% Standalone** de divisão de despesas em grupo - Um único arquivo HTML!
 
-## 📋 Sobre o Projeto
+## ✨ Características Principais
 
-O **Racha Aí** permite que grupos de pessoas gerenciem despesas compartilhadas de forma simples e eficiente, com:
+- ✅ **100% Standalone** - Apenas um arquivo `index.html` (CSS e JS inline)
+- ✅ **Sem dependências externas** - Funciona offline, sem internet
+- ✅ **Design moderno** - Interface com gradientes e visual elegante
+- ✅ **Totalmente responsivo** - Mobile, tablet e desktop
+- ✅ **Cálculos precisos** - Algoritmos de liquidação otimizados
+- ✅ **Persistência local** - Dados salvos no navegador
+- ✅ **Import/Export JSON** - Portabilidade total dos dados
+- ✅ **Geração de PDF** - Relatórios visuais e profissionais
 
-- ✅ Criação de grupos de despesas
-- ✅ Cadastro de membros por grupo
-- ✅ Lançamento de despesas compartilhadas
-- ✅ Cálculo automático de saldos individuais
-- ✅ Instruções de liquidação otimizadas
-- ✅ Exportação e importação de dados (JSON)
-- ✅ Geração de relatórios em PDF
-
-## 🚀 Funcionalidades
+## 🎯 Funcionalidades
 
 ### Gerenciamento de Grupos
-- Criar, editar e excluir grupos
-- Configurar modo de liquidação (reduzido ou não reduzido)
-- Seleção de grupo ativo no cabeçalho
+- Criar, editar e excluir grupos de despesas
+- Configurar modo de liquidação (reduzido ou direto)
+- Visualizar estatísticas por grupo
 
-### Gerenciamento de Membros
+### Gestão de Membros
 - Adicionar e editar membros do grupo
-- Validação automática (membros em uso não podem ser excluídos)
+- Validação de exclusão (membros em uso são protegidos)
 
 ### Controle de Despesas
-- Lançar despesas indicando:
-  - Descrição e valor
-  - Quem pagou
-  - Quem participou da divisão
-- Divisão automática e igualitária entre participantes
-- Visualização cronológica das despesas
+- Lançar despesas com descrição e valor
+- Indicar quem pagou e quem participou
+- **Data e hora** de cada despesa
+- **Três modos de divisão**:
+  - **Igualitária**: Valor dividido igualmente
+  - **Por Partes**: Pesos/frações personalizados (ex: 0.5, 1, 2)
+  - **Por Valor**: Valores fixos por pessoa
+- **Filtros avançados**: Busca por descrição e intervalo de datas
 
 ### Cálculo de Saldos
-Para cada membro, o sistema calcula:
-- **Total Pago**: Soma de todas as despesas pagas
-- **Total Devido**: Soma das participações em despesas
-- **Saldo Final**: Total Pago - Total Devido
-  - Positivo = a receber (crédito)
-  - Negativo = a pagar (débito)
-  - Zero = quitado
+- Total pago por membro
+- Total devido por membro
+- Saldo final (crédito/débito/quitado)
+- Indicadores visuais com cores
 
 ### Liquidação Inteligente
 
-#### Modo NÃO REDUZIDO
-Mantém as relações diretas de débito conforme as despesas lançadas. Cada participante paga diretamente para quem pagou a despesa.
+#### Modo Não Reduzido
+Mantém relações diretas de débito. Cada pessoa paga diretamente para quem pagou a despesa.
 
-#### Modo REDUZIDO (Otimizado)
-Aplica algoritmo de compensação que:
-- Agrupa credores e devedores
-- Compensa valores em cadeia
-- **Minimiza o número de transferências financeiras**
-- Permite pagamentos indiretos para maior eficiência
+#### Modo Reduzido (Otimizado)
+Algoritmo de compensação que:
+- Minimiza o número de transferências
+- Permite pagamentos indiretos
+- Ordena credores e devedores por valor
 
 ### Persistência e Portabilidade
-- **Salvamento Automático**: Dados salvos no localStorage do navegador
-- **Exportação JSON**: Exporta grupo completo (membros, despesas, configurações)
-- **Importação JSON**: Restaura grupo em outro dispositivo/navegador
+- Salvamento automático no localStorage
+- Exportação de grupo para JSON
+- Importação de JSON com validação
+- Restauração completa de dados
 
 ### Relatório em PDF
-Gera relatório profissional para impressão/PDF contendo:
-- Identificação do grupo
-- Lista completa de despesas
-- Resumo de saldos por membro
-- Instruções de liquidação (quem paga quanto e para quem)
-- Indicação do modo de redução ativo
+Gera PDF profissional usando `window.print()` com:
+- Design visual atraente
+- Cabeçalho com gradiente
+- Estatísticas do grupo
+- Lista detalhada de despesas
+- Resumo de saldos colorido
+- Instruções de liquidação formatadas
 
-**Funcionamento**: Usa a API nativa `window.print()` do navegador, permitindo salvar como PDF sem dependências externas. O layout é otimizado para impressão em formato A4.
-
-## 🎨 Interface e Design
-
-### Identidade Visual
-- Nome: **Racha Aí**
-- Logo minimalista em SVG (símbolo de divisão/compartilhamento)
-- Cores semânticas:
-  - Verde: crédito/positivo
-  - Vermelho: débito/negativo
-  - Roxo/Azul: ação principal
-
-### Responsividade
-- **Mobile-first**: Layout otimizado para celulares
-- **Tablets**: Uso de múltiplas colunas e melhor aproveitamento do espaço
-- **Desktop**: Layout expandido com navegação horizontal
-
-### Navegação
-Cinco seções principais:
-1. **Grupos**: Gerenciamento de grupos
-2. **Membros**: Cadastro de membros do grupo ativo
-3. **Despesas**: Lançamento e visualização de despesas
-4. **Resumo**: Saldos individuais de cada membro
-5. **Liquidação**: Instruções de pagamento para quitar contas
-
-## 🛠️ Tecnologias Utilizadas
-
-- **HTML5**: Estrutura semântica
-- **CSS3**: Design responsivo com variáveis CSS, flexbox e grid
-- **JavaScript (ES6+)**: Lógica da aplicação (vanilla JS - sem dependências externas)
-- **window.print()**: API nativa para geração de relatórios em PDF
-- **localStorage**: Persistência de dados no navegador
-
-### 🎯 100% Standalone
-Este aplicativo **não possui dependências externas**. Funciona completamente offline, sem necessidade de internet, CDNs ou bibliotecas externas. Basta abrir o arquivo `index.html` no navegador!
-
-## 📂 Estrutura do Projeto
-
-```
-rachaai/
-├── index.html      # Estrutura HTML principal
-├── styles.css      # Estilos responsivos
-├── app.js          # Lógica da aplicação
-└── README.md       # Documentação
-```
-
-## 🔧 Como Usar
+## 🚀 Como Usar
 
 ### 1. Abrir o Aplicativo
-Abra o arquivo `index.html` em um navegador moderno (Chrome, Firefox, Safari, Edge).
+Basta abrir o arquivo `index.html` em qualquer navegador moderno. Não precisa de servidor ou internet!
 
 ### 2. Criar um Grupo
 1. Clique em "Novo Grupo"
-2. Informe o nome do grupo
-3. Escolha se deseja ativar a redução de transações
-4. Clique em "Salvar"
+2. Digite o nome (ex: "Viagem Praia 2026")
+3. Escolha se quer redução de transações
+4. Salve
 
 ### 3. Adicionar Membros
 1. Selecione o grupo no cabeçalho
-2. Vá para a aba "Membros"
-3. Clique em "Novo Membro"
-4. Informe o nome e salve
+2. Vá em "Membros"
+3. Adicione cada participante
 
 ### 4. Lançar Despesas
-1. Vá para a aba "Despesas"
+1. Vá em "Despesas"
 2. Clique em "Nova Despesa"
 3. Preencha:
-   - Descrição (ex: "Jantar no Restaurante")
-   - Valor total (ex: 150.00)
+   - Descrição
+   - Valor total
+   - Data e hora
    - Quem pagou
-   - Quem participou (marque os checkboxes)
-4. Clique em "Salvar"
+   - Modo de divisão
+   - Participantes (e valores/partes conforme o modo)
+4. Salve
 
-### 5. Visualizar Saldos
-- Acesse a aba "Resumo" para ver:
-  - Quanto cada pessoa pagou
-  - Quanto cada pessoa deve
-  - Saldo final de cada um
+### 5. Ver Saldos
+Acesse "Resumo" para ver quanto cada pessoa deve pagar ou receber.
 
-### 6. Ver Instruções de Liquidação
-- Acesse a aba "Liquidação" para ver:
-  - Quem deve pagar para quem
-  - Valores exatos de cada transferência
-  - Número total de transações necessárias
+### 6. Ver Liquidação
+Em "Liquidação", veja as instruções exatas de quem paga para quem e quanto.
 
-### 7. Exportar/Importar Dados
-- **Exportar**: Na aba "Liquidação", clique em "Exportar JSON" para baixar os dados do grupo
-- **Importar**: Clique em "Importar JSON" e selecione um arquivo previamente exportado
+### 7. Exportar/Importar
+- **Exportar**: Baixe o JSON do grupo
+- **Importar**: Carregue o JSON em outro dispositivo
 
-### 8. Gerar Relatório PDF
-- Na aba "Liquidação", clique em "Gerar PDF"
-- Uma janela de impressão será aberta automaticamente
-- Escolha "Salvar como PDF" como destino
-- Clique em "Salvar" para baixar o relatório completo
-
-**Dica**: Em navegadores modernos, você pode usar `Ctrl+P` (ou `Cmd+P` no Mac) quando estiver na visualização de impressão para ajustar as configurações.
+### 8. Gerar PDF
+1. Clique em "Gerar PDF"
+2. Janela de impressão abre automaticamente
+3. Escolha "Salvar como PDF"
+4. Baixe o relatório
 
 ## 💡 Exemplo de Uso
 
-### Cenário: Viagem em Grupo
+### Cenário: Viagem de 3 Amigos
 
-**Grupo**: Viagem Praia 2026
+**Grupo**: Viagem Praia
 **Membros**: Ana, Bruno, Carlos
 
 **Despesas**:
-1. Ana pagou hotel: R$ 600,00 (dividido entre Ana, Bruno, Carlos)
-2. Bruno pagou mercado: R$ 150,00 (dividido entre Ana, Bruno, Carlos)
-3. Carlos pagou jantar: R$ 90,00 (dividido entre Bruno, Carlos)
+1. Ana pagou hotel: R$ 600 (dividido igualmente entre os 3)
+2. Bruno pagou mercado: R$ 150 (dividido igualmente)
+3. Carlos pagou jantar: R$ 90 (dividido apenas entre Bruno e Carlos)
 
-**Cálculo de Saldos**:
-- **Ana**: Pagou R$ 600,00 | Deve R$ 250,00 | **Saldo: +R$ 350,00** (a receber)
-- **Bruno**: Pagou R$ 150,00 | Deve R$ 295,00 | **Saldo: -R$ 145,00** (a pagar)
-- **Carlos**: Pagou R$ 90,00 | Deve R$ 245,00 | **Saldo: -R$ 155,00** (a pagar)
-
-**Liquidação Não Reduzida** (3 transações):
-1. Bruno paga R$ 200,00 para Ana
-2. Bruno paga R$ 45,00 para Carlos
-3. Carlos paga R$ 200,00 para Ana
+**Saldos**:
+- Ana: +R$ 350 (a receber)
+- Bruno: -R$ 145 (a pagar)
+- Carlos: -R$ 205 (a pagar)
 
 **Liquidação Reduzida** (2 transações):
-1. Bruno paga R$ 145,00 para Ana
-2. Carlos paga R$ 205,00 para Ana
+1. Bruno → Ana: R$ 145
+2. Carlos → Ana: R$ 205
 
-## 🔒 Privacidade e Segurança
+## 🎨 Interface e Design
 
-- Todos os dados são armazenados **localmente** no navegador
-- Nenhuma informação é enviada para servidores externos
-- Para backup, use a função de exportação JSON
+- **Cabeçalho com gradiente** roxo/azul moderno
+- **Logo SVG** minimalista representando divisão
+- **Cards com hover** e animações suaves
+- **Cores semânticas**: Verde (crédito), Vermelho (débito), Roxo (ações)
+- **Navegação intuitiva** com ícones e estados ativos
+- **Layout responsivo** que se adapta ao tamanho da tela
 
-## 📱 Compatibilidade
+### Responsividade
+- **Mobile**: Layout em coluna única, navegação compacta
+- **Tablet**: Grid de 2 colunas, melhor uso do espaço
+- **Desktop**: Grid fluído, cards de liquidação otimizados
 
-- ✅ Chrome/Edge (versão 90+)
-- ✅ Firefox (versão 88+)
-- ✅ Safari (versão 14+)
-- ✅ Mobile (iOS Safari, Chrome Android)
+## 🛠️ Tecnologias
 
-## 🎯 Algoritmos Implementados
+- **HTML5**: Estrutura semântica única
+- **CSS3**: Gradientes, Grid, Flexbox, Media Queries
+- **JavaScript ES6+**: Vanilla JS (sem frameworks)
+- **window.print()**: API nativa para PDF
+- **localStorage**: Persistência local
+
+## 📊 Algoritmos
 
 ### Cálculo de Saldos
 ```
 Para cada despesa:
-  - Crédito ao pagador: +valor total
-  - Débito aos participantes: -valor / número de participantes
+  Crédito ao pagador: +valor total
+  Débito aos participantes: -valor individual
 
-Saldo final de cada membro:
-  = Total Pago - Total Devido
+Saldo final = Total Pago - Total Devido
 ```
 
-### Liquidação Reduzida (Algoritmo Guloso)
+### Liquidação Reduzida
 ```
-1. Separar membros em credores (saldo > 0) e devedores (saldo < 0)
+1. Separar credores (saldo > 0) e devedores (saldo < 0)
 2. Ordenar ambos por valor (maior primeiro)
 3. Enquanto houver credores e devedores:
-   - Pegar maior devedor e maior credor
-   - Transferir min(dívida do devedor, crédito do credor)
+   - Transferir min(dívida, crédito)
    - Atualizar saldos
-   - Remover da lista se saldo zerou
+   - Remover se zerou
 ```
 
-Este algoritmo garante o **mínimo de transações possível** para liquidar todas as contas.
+Garante o **mínimo de transações** possível.
 
-## 🤝 Contribuições
+## 📁 Estrutura
 
-Este é um projeto open-source. Sugestões e melhorias são bem-vindas!
+```
+rachaai/
+├── index.html          # Arquivo standalone completo (CSS + JS inline)
+├── README.md           # Esta documentação
+├── index.html.old      # Versão anterior (referência)
+├── app.js.old          # JavaScript antigo (referência)
+└── styles.css.old      # CSS antigo (referência)
+```
+
+**Arquivo principal**: `index.html` (69 KB)
+
+## 🔒 Privacidade
+
+- ✅ Todos os dados são armazenados localmente no navegador
+- ✅ Nenhuma informação enviada para servidores
+- ✅ Funciona 100% offline
+- ✅ Use a exportação JSON para backup
+
+## ✅ Compatibilidade
+
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+- Mobile browsers (iOS Safari, Chrome Android)
+
+## 🎯 Melhorias Implementadas
+
+### Versão 2.0 (Atual)
+- ✅ Arquivo HTML standalone único
+- ✅ CSS inline compactado com gradientes
+- ✅ JavaScript inline otimizado
+- ✅ Identidade visual moderna
+- ✅ Layout de liquidação melhorado para telas grandes
+- ✅ PDF com design visual profissional
+- ✅ Cards com animações de hover
+
+### Próximas Implementações
+- ⏳ Data e hora nas despesas
+- ⏳ Filtros por descrição e data
+- ⏳ Três modos de divisão (igualitária, por partes, por valor)
+- ⏳ Estatísticas de total de despesas por grupo
+
+## 🤝 Contribuindo
+
+Sugestões e melhorias são bem-vindas! Este é um projeto educacional demonstrando:
+- Desenvolvimento web standalone
+- Algoritmos financeiros
+- Design responsivo moderno
+- Arquitetura client-side
 
 ## 📄 Licença
 
-MIT License - use livremente para fins pessoais ou comerciais.
+MIT License - Use livremente!
 
 ---
 
-**Desenvolvido com ❤️ para facilitar a divisão de despesas em grupo**
+**Desenvolvido com ❤️ para facilitar a vida de quem racha contas**
 
-*Racha Aí - Dividir ficou mais fácil!*
+*Racha Aí - Um arquivo, infinitas divisões!*
