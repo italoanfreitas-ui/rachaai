@@ -60,12 +60,14 @@ Aplica algoritmo de compensação que:
 - **Importação JSON**: Restaura grupo em outro dispositivo/navegador
 
 ### Relatório em PDF
-Gera PDF profissional contendo:
+Gera relatório profissional para impressão/PDF contendo:
 - Identificação do grupo
 - Lista completa de despesas
 - Resumo de saldos por membro
 - Instruções de liquidação (quem paga quanto e para quem)
 - Indicação do modo de redução ativo
+
+**Funcionamento**: Usa a API nativa `window.print()` do navegador, permitindo salvar como PDF sem dependências externas. O layout é otimizado para impressão em formato A4.
 
 ## 🎨 Interface e Design
 
@@ -94,9 +96,12 @@ Cinco seções principais:
 
 - **HTML5**: Estrutura semântica
 - **CSS3**: Design responsivo com variáveis CSS, flexbox e grid
-- **JavaScript (ES6+)**: Lógica da aplicação (vanilla JS)
-- **jsPDF**: Geração de relatórios em PDF
+- **JavaScript (ES6+)**: Lógica da aplicação (vanilla JS - sem dependências externas)
+- **window.print()**: API nativa para geração de relatórios em PDF
 - **localStorage**: Persistência de dados no navegador
+
+### 🎯 100% Standalone
+Este aplicativo **não possui dependências externas**. Funciona completamente offline, sem necessidade de internet, CDNs ou bibliotecas externas. Basta abrir o arquivo `index.html` no navegador!
 
 ## 📂 Estrutura do Projeto
 
@@ -152,7 +157,12 @@ Abra o arquivo `index.html` em um navegador moderno (Chrome, Firefox, Safari, Ed
 - **Importar**: Clique em "Importar JSON" e selecione um arquivo previamente exportado
 
 ### 8. Gerar Relatório PDF
-- Na aba "Liquidação", clique em "Gerar PDF" para criar um relatório completo
+- Na aba "Liquidação", clique em "Gerar PDF"
+- Uma janela de impressão será aberta automaticamente
+- Escolha "Salvar como PDF" como destino
+- Clique em "Salvar" para baixar o relatório completo
+
+**Dica**: Em navegadores modernos, você pode usar `Ctrl+P` (ou `Cmd+P` no Mac) quando estiver na visualização de impressão para ajustar as configurações.
 
 ## 💡 Exemplo de Uso
 

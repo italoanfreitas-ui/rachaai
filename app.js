@@ -316,12 +316,13 @@ const Calculos = {
 };
 
 // ============================================
-// Geração de PDF
+// Geração de PDF (usando window.print)
 // ============================================
 
 const PDFGenerator = {
     /**
-     * Gera um relatório em PDF do grupo ativo
+     * Gera um relatório em PDF do grupo ativo usando window.print()
+     * O usuário pode salvar como PDF usando Ctrl+P ou o botão de impressão do navegador
      */
     gerarRelatorio() {
         if (!AppState.grupoAtivo) {
@@ -330,152 +331,155 @@ const PDFGenerator = {
         }
 
         const grupo = AppState.grupoAtivo;
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        let y = 20;
-        const lineHeight = 7;
-        const pageHeight = doc.internal.pageSize.height;
-
-        // Função auxiliar para adicionar nova página se necessário
-        const checkPageBreak = () => {
-            if (y > pageHeight - 20) {
-                doc.addPage();
-                y = 20;
-            }
-        };
-
-        // Título
-        doc.setFontSize(20);
-        doc.setFont(undefined, 'bold');
-        doc.text('Racha Aí - Relatório de Despesas', 105, y, { align: 'center' });
-        y += lineHeight * 2;
-
-        // Nome do Grupo
-        doc.setFontSize(16);
-        doc.text(`Grupo: ${grupo.nome}`, 20, y);
-        y += lineHeight * 1.5;
-
-        // Data de geração
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        doc.text(`Gerado em: ${Utils.formatarData(Date.now())}`, 20, y);
-        y += lineHeight;
-
-        // Configuração
-        doc.text(`Redução de transações: ${grupo.reducaoTransacoes ? 'Ativa' : 'Inativa'}`, 20, y);
-        y += lineHeight * 2;
-
-        // Membros
-        checkPageBreak();
-        doc.setFontSize(14);
-        doc.setFont(undefined, 'bold');
-        doc.text('Membros', 20, y);
-        y += lineHeight;
-
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        grupo.membros.forEach((membro, index) => {
-            checkPageBreak();
-            doc.text(`${index + 1}. ${membro.nome}`, 25, y);
-            y += lineHeight;
-        });
-        y += lineHeight;
-
-        // Despesas
-        checkPageBreak();
-        doc.setFontSize(14);
-        doc.setFont(undefined, 'bold');
-        doc.text('Despesas', 20, y);
-        y += lineHeight;
-
-        if (grupo.despesas.length === 0) {
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'italic');
-            doc.text('Nenhuma despesa lançada.', 25, y);
-            y += lineHeight * 2;
-        } else {
-            grupo.despesas.forEach((despesa, index) => {
-                checkPageBreak();
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'bold');
-                doc.text(`${index + 1}. ${despesa.descricao}`, 25, y);
-                y += lineHeight;
-
-                doc.setFont(undefined, 'normal');
-                const pagador = grupo.membros.find(m => m.id === despesa.pagadorId);
-                doc.text(`   Valor: ${Utils.formatarMoeda(despesa.valor)}`, 25, y);
-                y += lineHeight;
-                doc.text(`   Pagador: ${pagador.nome}`, 25, y);
-                y += lineHeight;
-
-                const participantes = despesa.participantes
-                    .map(id => grupo.membros.find(m => m.id === id)?.nome)
-                    .join(', ');
-                doc.text(`   Participantes: ${participantes}`, 25, y);
-                y += lineHeight * 1.5;
-            });
-        }
-
-        // Resumo de Saldos
-        checkPageBreak();
-        doc.setFontSize(14);
-        doc.setFont(undefined, 'bold');
-        doc.text('Resumo de Saldos', 20, y);
-        y += lineHeight;
-
         const saldos = Calculos.calcularSaldos(grupo);
-        Object.values(saldos).forEach(saldo => {
-            checkPageBreak();
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'bold');
-            doc.text(saldo.nome, 25, y);
-            y += lineHeight;
-
-            doc.setFont(undefined, 'normal');
-            doc.text(`   Total Pago: ${Utils.formatarMoeda(saldo.totalPago)}`, 25, y);
-            y += lineHeight;
-            doc.text(`   Total Devido: ${Utils.formatarMoeda(saldo.totalDevido)}`, 25, y);
-            y += lineHeight;
-
-            const saldoTexto = saldo.saldo >= 0
-                ? `Crédito de ${Utils.formatarMoeda(saldo.saldo)}`
-                : `Débito de ${Utils.formatarMoeda(Math.abs(saldo.saldo))}`;
-            doc.setFont(undefined, 'bold');
-            doc.text(`   Saldo: ${saldoTexto}`, 25, y);
-            y += lineHeight * 1.5;
-        });
-
-        // Instruções de Liquidação
-        checkPageBreak();
-        doc.setFontSize(14);
-        doc.setFont(undefined, 'bold');
-        doc.text('Instruções de Liquidação', 20, y);
-        y += lineHeight;
-
         const transacoes = grupo.reducaoTransacoes
             ? Calculos.calcularLiquidacaoReduzida(grupo)
             : Calculos.calcularLiquidacaoNaoReduzida(grupo);
 
-        if (transacoes.length === 0) {
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'italic');
-            doc.text('Todas as contas estão quitadas!', 25, y);
+        // Constrói o HTML para impressão
+        let html = `
+            <div class="print-header">
+                <div class="print-title">Racha Aí - Relatório de Despesas</div>
+                <div class="print-subtitle">${grupo.nome}</div>
+                <div class="print-info">
+                    Gerado em: ${Utils.formatarData(Date.now())}
+                </div>
+            </div>
+
+            <div class="print-config">
+                <strong>Configuração:</strong> Redução de transações ${grupo.reducaoTransacoes ? 'ATIVA' : 'INATIVA'}
+                ${grupo.reducaoTransacoes ? '<br>As transações foram otimizadas para minimizar o número de transferências.' : '<br>As transações mantêm as relações diretas conforme as despesas lançadas.'}
+            </div>
+        `;
+
+        // Membros
+        html += `
+            <div class="print-section">
+                <div class="print-section-title">Membros</div>
+        `;
+
+        if (grupo.membros.length === 0) {
+            html += '<p style="color: #999; font-style: italic;">Nenhum membro cadastrado.</p>';
         } else {
-            transacoes.forEach((transacao, index) => {
-                checkPageBreak();
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'normal');
-                doc.text(
-                    `${index + 1}. ${transacao.de} paga ${Utils.formatarMoeda(transacao.valor)} para ${transacao.para}`,
-                    25, y
-                );
-                y += lineHeight;
+            grupo.membros.forEach((membro, index) => {
+                html += `<div class="print-member">${index + 1}. ${membro.nome}</div>`;
             });
         }
 
-        // Salva o PDF
-        doc.save(`racha-ai-${grupo.nome.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+        html += '</div>';
+
+        // Despesas
+        html += `
+            <div class="print-section">
+                <div class="print-section-title">Despesas</div>
+        `;
+
+        if (grupo.despesas.length === 0) {
+            html += '<p style="color: #999; font-style: italic;">Nenhuma despesa lançada.</p>';
+        } else {
+            grupo.despesas.forEach((despesa, index) => {
+                const pagador = grupo.membros.find(m => m.id === despesa.pagadorId);
+                const participantes = despesa.participantes
+                    .map(id => grupo.membros.find(m => m.id === id)?.nome)
+                    .join(', ');
+
+                html += `
+                    <div class="print-expense">
+                        <div class="print-expense-title">${index + 1}. ${despesa.descricao}</div>
+                        <div class="print-expense-detail">
+                            <span class="print-expense-label">Valor:</span>
+                            <span>${Utils.formatarMoeda(despesa.valor)}</span>
+                        </div>
+                        <div class="print-expense-detail">
+                            <span class="print-expense-label">Pagador:</span>
+                            <span>${pagador ? pagador.nome : 'Desconhecido'}</span>
+                        </div>
+                        <div class="print-expense-detail">
+                            <span class="print-expense-label">Participantes:</span>
+                            <span>${participantes}</span>
+                        </div>
+                        <div class="print-expense-detail">
+                            <span class="print-expense-label">Valor por pessoa:</span>
+                            <span>${Utils.formatarMoeda(despesa.valor / despesa.participantes.length)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        html += '</div>';
+
+        // Resumo de Saldos
+        html += `
+            <div class="print-section">
+                <div class="print-section-title">Resumo de Saldos</div>
+        `;
+
+        Object.values(saldos).forEach(saldo => {
+            const saldoClass = saldo.saldo > 0.01 ? 'print-balance-positive'
+                : saldo.saldo < -0.01 ? 'print-balance-negative'
+                : 'print-balance-zero';
+
+            const statusTexto = saldo.saldo > 0.01 ? 'A RECEBER'
+                : saldo.saldo < -0.01 ? 'A PAGAR'
+                : 'QUITADO';
+
+            html += `
+                <div class="print-balance">
+                    <div class="print-balance-name">${saldo.nome} <span style="font-size: 9pt; color: #666;">[${statusTexto}]</span></div>
+                    <div class="print-balance-detail">
+                        <span class="print-expense-label">Total Pago:</span>
+                        <span>${Utils.formatarMoeda(saldo.totalPago)}</span>
+                    </div>
+                    <div class="print-balance-detail">
+                        <span class="print-expense-label">Total Devido:</span>
+                        <span>${Utils.formatarMoeda(saldo.totalDevido)}</span>
+                    </div>
+                    <div class="print-balance-final ${saldoClass}">
+                        <span>Saldo Final:</span>
+                        <span>${Utils.formatarMoeda(Math.abs(saldo.saldo))}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+
+        // Instruções de Liquidação
+        html += `
+            <div class="print-section">
+                <div class="print-section-title">Instruções de Liquidação</div>
+        `;
+
+        if (transacoes.length === 0) {
+            html += '<p style="color: #10b981; font-weight: bold; font-style: italic;">✓ Todas as contas estão quitadas!</p>';
+        } else {
+            html += `<div class="print-config" style="margin-bottom: 15px;"><strong>Total de transações necessárias:</strong> ${transacoes.length}</div>`;
+
+            transacoes.forEach((transacao, index) => {
+                html += `
+                    <div class="print-settlement">
+                        <span class="print-settlement-number">${index + 1}.</span>
+                        <span class="print-settlement-text">
+                            <strong>${transacao.de}</strong> paga
+                            <span class="print-settlement-amount">${Utils.formatarMoeda(transacao.valor)}</span>
+                            para <strong>${transacao.para}</strong>
+                        </span>
+                    </div>
+                `;
+            });
+        }
+
+        html += '</div>';
+
+        // Insere o HTML na área de impressão e dispara a impressão
+        const printArea = document.getElementById('printArea');
+        printArea.innerHTML = html;
+
+        // Aguarda um momento para o DOM ser atualizado e dispara a impressão
+        setTimeout(() => {
+            window.print();
+        }, 100);
     }
 };
 
