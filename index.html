@@ -123,6 +123,12 @@
                     Nova Despesa
                 </button>
             </div>
+            <div class="filter-box" style="margin-bottom: 1.5rem;">
+                <input type="text" class="filter-input" id="filtroDescricao" placeholder="Filtrar por descrição...">
+                <input type="date" class="filter-input" id="filtroDataInicio" placeholder="Data inicial">
+                <input type="date" class="filter-input" id="filtroDataFim" placeholder="Data final">
+                <button class="btn btn-secondary btn-small" id="btnLimparFiltros">Limpar</button>
+            </div>
             <div class="empty-state" id="emptyStateDespesas">
                 <p>Selecione um grupo e cadastre membros para lançar despesas</p>
             </div>
@@ -244,10 +250,31 @@
                     <input type="number" id="inputValorDespesa" step="0.01" min="0.01" placeholder="0,00" required>
                 </div>
                 <div class="form-group">
+                    <label for="inputDataDespesa">Data e Hora</label>
+                    <input type="datetime-local" id="inputDataDespesa" required>
+                </div>
+                <div class="form-group">
                     <label for="selectPagador">Quem pagou?</label>
                     <select id="selectPagador" required>
                         <option value="">Selecione...</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Modo de Divisão</label>
+                    <div class="mode-selector">
+                        <button type="button" class="mode-btn active" data-mode="igual" id="modoIgual">
+                            Igualitária
+                        </button>
+                        <button type="button" class="mode-btn" data-mode="partes" id="modoPartes">
+                            Por Partes
+                        </button>
+                        <button type="button" class="mode-btn" data-mode="valor" id="modoValor">
+                            Por Valor
+                        </button>
+                    </div>
+                    <small id="modoDescricao" style="display: block; margin-top: 0.5rem; color: var(--gray-500);">
+                        Valor dividido igualmente entre os participantes
+                    </small>
                 </div>
                 <div class="form-group">
                     <label>Quem participou da divisão?</label>
@@ -259,7 +286,7 @@
                             Selecionar Nenhum
                         </button>
                     </div>
-                    <div id="checkboxParticipantes" class="checkbox-group"></div>
+                    <div id="checkboxParticipantes" class="participantes-list"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -484,15 +511,45 @@ const Calculos = {
 
         // Processa cada despesa
         grupo.despesas.forEach(despesa => {
-            const valorPorParticipante = despesa.valor / despesa.participantes.length;
+            const modoDivisao = despesa.modoDivisao || 'igual';
 
             // Adiciona crédito ao pagador
             saldos[despesa.pagadorId].totalPago += despesa.valor;
 
-            // Adiciona débito aos participantes
-            despesa.participantes.forEach(participanteId => {
-                saldos[participanteId].totalDevido += valorPorParticipante;
-            });
+            // Calcula débitos conforme o modo de divisão
+            if (modoDivisao === 'igual') {
+                // Divisão igualitária
+                const participantes = Array.isArray(despesa.participantes)
+                    ? despesa.participantes
+                    : Object.keys(despesa.participantes);
+                const valorPorParticipante = despesa.valor / participantes.length;
+
+                participantes.forEach(participanteId => {
+                    if (saldos[participanteId]) {
+                        saldos[participanteId].totalDevido += valorPorParticipante;
+                    }
+                });
+            } else if (modoDivisao === 'partes') {
+                // Divisão por partes/pesos
+                const participantes = despesa.participantes;
+                const totalPartes = Object.values(participantes).reduce((sum, p) => sum + p, 0);
+
+                Object.entries(participantes).forEach(([participanteId, partes]) => {
+                    if (saldos[participanteId]) {
+                        const valorProporcional = (partes / totalPartes) * despesa.valor;
+                        saldos[participanteId].totalDevido += valorProporcional;
+                    }
+                });
+            } else if (modoDivisao === 'valor') {
+                // Divisão por valor fixo
+                const participantes = despesa.participantes;
+
+                Object.entries(participantes).forEach(([participanteId, valorFixo]) => {
+                    if (saldos[participanteId]) {
+                        saldos[participanteId].totalDevido += valorFixo;
+                    }
+                });
+            }
         });
 
         // Calcula saldo final
@@ -513,21 +570,45 @@ const Calculos = {
 
         // Processa cada despesa para rastrear débitos diretos
         grupo.despesas.forEach(despesa => {
-            const valorPorParticipante = despesa.valor / despesa.participantes.length;
+            const modoDivisao = despesa.modoDivisao || 'igual';
             const pagadorId = despesa.pagadorId;
 
-            despesa.participantes.forEach(participanteId => {
-                // Se o participante não é o pagador, ele deve ao pagador
-                if (participanteId !== pagadorId) {
-                    if (!debitos[participanteId]) {
-                        debitos[participanteId] = {};
+            if (modoDivisao === 'igual') {
+                const participantes = Array.isArray(despesa.participantes)
+                    ? despesa.participantes
+                    : Object.keys(despesa.participantes);
+                const valorPorParticipante = despesa.valor / participantes.length;
+
+                participantes.forEach(participanteId => {
+                    if (participanteId !== pagadorId) {
+                        if (!debitos[participanteId]) debitos[participanteId] = {};
+                        if (!debitos[participanteId][pagadorId]) debitos[participanteId][pagadorId] = 0;
+                        debitos[participanteId][pagadorId] += valorPorParticipante;
                     }
-                    if (!debitos[participanteId][pagadorId]) {
-                        debitos[participanteId][pagadorId] = 0;
+                });
+            } else if (modoDivisao === 'partes') {
+                const participantes = despesa.participantes;
+                const totalPartes = Object.values(participantes).reduce((sum, p) => sum + p, 0);
+
+                Object.entries(participantes).forEach(([participanteId, partes]) => {
+                    if (participanteId !== pagadorId) {
+                        const valorProporcional = (partes / totalPartes) * despesa.valor;
+                        if (!debitos[participanteId]) debitos[participanteId] = {};
+                        if (!debitos[participanteId][pagadorId]) debitos[participanteId][pagadorId] = 0;
+                        debitos[participanteId][pagadorId] += valorProporcional;
                     }
-                    debitos[participanteId][pagadorId] += valorPorParticipante;
-                }
-            });
+                });
+            } else if (modoDivisao === 'valor') {
+                const participantes = despesa.participantes;
+
+                Object.entries(participantes).forEach(([participanteId, valorFixo]) => {
+                    if (participanteId !== pagadorId) {
+                        if (!debitos[participanteId]) debitos[participanteId] = {};
+                        if (!debitos[participanteId][pagadorId]) debitos[participanteId][pagadorId] = 0;
+                        debitos[participanteId][pagadorId] += valorFixo;
+                    }
+                });
+            }
         });
 
         // Converte os débitos em transações
@@ -838,6 +919,25 @@ const UI = {
         document.getElementById('btnFecharModalDetalhamento').addEventListener('click', () => this.fecharModalDetalhamento());
         document.getElementById('btnFecharDetalhamento').addEventListener('click', () => this.fecharModalDetalhamento());
 
+        // Filtros de despesas
+        document.getElementById('filtroDescricao').addEventListener('input', () => this.renderizarDespesas());
+        document.getElementById('filtroDataInicio').addEventListener('change', () => this.renderizarDespesas());
+        document.getElementById('filtroDataFim').addEventListener('change', () => this.renderizarDespesas());
+        document.getElementById('btnLimparFiltros').addEventListener('click', () => {
+            document.getElementById('filtroDescricao').value = '';
+            document.getElementById('filtroDataInicio').value = '';
+            document.getElementById('filtroDataFim').value = '';
+            this.renderizarDespesas();
+        });
+
+        // Modo de divisão
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modo = e.currentTarget.dataset.mode;
+                this.selecionarModoDivisao(modo);
+            });
+        });
+
         // Ações de liquidação
         document.getElementById('btnExportar').addEventListener('click', () => {
             if (AppState.grupoAtivo) {
@@ -1066,8 +1166,44 @@ const UI = {
         }
 
         container.innerHTML = '';
+
+        // Aplica filtros
+        const filtroDesc = document.getElementById('filtroDescricao').value.toLowerCase();
+        const filtroInicio = document.getElementById('filtroDataInicio').value;
+        const filtroFim = document.getElementById('filtroDataFim').value;
+
+        let despesasFiltradas = [...AppState.grupoAtivo.despesas];
+
+        // Filtra por descrição
+        if (filtroDesc) {
+            despesasFiltradas = despesasFiltradas.filter(d =>
+                d.descricao.toLowerCase().includes(filtroDesc)
+            );
+        }
+
+        // Filtra por data inicial
+        if (filtroInicio) {
+            const dataInicioTimestamp = new Date(filtroInicio).setHours(0, 0, 0, 0);
+            despesasFiltradas = despesasFiltradas.filter(d =>
+                d.timestamp >= dataInicioTimestamp
+            );
+        }
+
+        // Filtra por data final
+        if (filtroFim) {
+            const dataFimTimestamp = new Date(filtroFim).setHours(23, 59, 59, 999);
+            despesasFiltradas = despesasFiltradas.filter(d =>
+                d.timestamp <= dataFimTimestamp
+            );
+        }
+
         // Ordena por timestamp (mais recente primeiro)
-        const despesasOrdenadas = [...AppState.grupoAtivo.despesas].sort((a, b) => b.timestamp - a.timestamp);
+        const despesasOrdenadas = despesasFiltradas.sort((a, b) => b.timestamp - a.timestamp);
+
+        if (despesasOrdenadas.length === 0 && AppState.grupoAtivo.despesas.length > 0) {
+            container.innerHTML = '<div class="empty-state">Nenhuma despesa encontrada com os filtros aplicados.</div>';
+            return;
+        }
 
         despesasOrdenadas.forEach(despesa => {
             const pagador = AppState.grupoAtivo.membros.find(m => m.id === despesa.pagadorId);
@@ -1139,6 +1275,31 @@ const UI = {
         container.innerHTML = '';
 
         const saldos = Calculos.calcularSaldos(AppState.grupoAtivo);
+
+        // Calcula estatísticas
+        const totalDespesas = AppState.grupoAtivo.despesas.reduce((sum, d) => sum + d.valor, 0);
+        const numDespesas = AppState.grupoAtivo.despesas.length;
+
+        // Card de estatísticas
+        const statsCard = document.createElement('div');
+        statsCard.className = 'stats-card';
+        statsCard.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Total de Despesas</div>
+                    <div class="stat-value">${Utils.formatarMoeda(totalDespesas)}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Número de Despesas</div>
+                    <div class="stat-value">${numDespesas}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Média por Despesa</div>
+                    <div class="stat-value">${numDespesas > 0 ? Utils.formatarMoeda(totalDespesas / numDespesas) : 'R$ 0,00'}</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(statsCard);
 
         Object.entries(saldos).forEach(([membroId, saldo]) => {
             const saldoClass = saldo.saldo > 0.01 ? 'saldo-positivo' : saldo.saldo < -0.01 ? 'saldo-negativo' : 'saldo-zero';
@@ -1440,16 +1601,11 @@ const UI = {
             selectPagador.appendChild(option);
         });
 
-        // Popula os checkboxes de participantes
-        checkboxContainer.innerHTML = '';
-        AppState.grupoAtivo.membros.forEach(membro => {
-            const label = document.createElement('label');
-            label.innerHTML = `
-                <input type="checkbox" name="participante" value="${membro.id}">
-                ${membro.nome}
-            `;
-            checkboxContainer.appendChild(label);
-        });
+        // Pega a referência do campo de data/hora
+        const inputData = document.getElementById('inputDataDespesa');
+
+        // Determina o modo de divisão
+        let modo = 'igual';
 
         if (despesaId) {
             AppState.editandoDespesa = AppState.grupoAtivo.despesas.find(d => d.id === despesaId);
@@ -1458,17 +1614,61 @@ const UI = {
             inputValor.value = AppState.editandoDespesa.valor;
             selectPagador.value = AppState.editandoDespesa.pagadorId;
 
-            // Marca os participantes
-            AppState.editandoDespesa.participantes.forEach(pId => {
-                const checkbox = checkboxContainer.querySelector(`input[value="${pId}"]`);
-                if (checkbox) checkbox.checked = true;
-            });
+            // Preenche o campo de data/hora
+            const dataObj = new Date(AppState.editandoDespesa.timestamp);
+            const dataISO = new Date(dataObj.getTime() - dataObj.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            inputData.value = dataISO;
+
+            // Define o modo de divisão (retrocompatibilidade)
+            modo = AppState.editandoDespesa.modoDivisao || 'igual';
         } else {
             AppState.editandoDespesa = null;
             titulo.textContent = 'Nova Despesa';
             inputDescricao.value = '';
             inputValor.value = '';
             selectPagador.value = '';
+
+            // Define data/hora atual por padrão
+            const agora = new Date();
+            const agoraISO = new Date(agora.getTime() - agora.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            inputData.value = agoraISO;
+        }
+
+        // Seleciona o modo de divisão
+        this.selecionarModoDivisao(modo);
+
+        // Se estiver editando, marca e preenche os participantes
+        if (despesaId && AppState.editandoDespesa) {
+            setTimeout(() => {
+                if (AppState.editandoDespesa.participantes) {
+                    if (Array.isArray(AppState.editandoDespesa.participantes)) {
+                        // Formato antigo (apenas IDs)
+                        AppState.editandoDespesa.participantes.forEach(pId => {
+                            const checkbox = checkboxContainer.querySelector(`input[value="${pId}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    } else {
+                        // Formato novo (objeto com valores)
+                        Object.entries(AppState.editandoDespesa.participantes).forEach(([pId, valor]) => {
+                            const checkbox = checkboxContainer.querySelector(`input[value="${pId}"]`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                                if (modo !== 'igual' && valor) {
+                                    const input = checkbox.parentElement.querySelector('input[type="number"]');
+                                    if (input) {
+                                        input.value = valor;
+                                        input.disabled = false;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }, 50);
         }
 
         modal.classList.add('active');
@@ -1483,13 +1683,34 @@ const UI = {
     salvarDespesa() {
         const inputDescricao = document.getElementById('inputDescricaoDespesa');
         const inputValor = document.getElementById('inputValorDespesa');
+        const inputData = document.getElementById('inputDataDespesa');
         const selectPagador = document.getElementById('selectPagador');
         const checkboxes = document.querySelectorAll('input[name="participante"]:checked');
 
         const descricao = inputDescricao.value.trim();
         const valor = parseFloat(inputValor.value);
+        const dataHora = inputData.value ? new Date(inputData.value).getTime() : Date.now();
         const pagadorId = selectPagador.value;
-        const participantes = Array.from(checkboxes).map(cb => cb.value);
+
+        // Determina o modo de divisão ativo
+        const modoBtn = document.querySelector('.mode-btn.active');
+        const modoDivisao = modoBtn ? modoBtn.dataset.mode : 'igual';
+
+        // Coleta participantes e valores conforme o modo
+        let participantes;
+        if (modoDivisao === 'igual') {
+            // Modo igual: array simples de IDs
+            participantes = Array.from(checkboxes).map(cb => cb.value);
+        } else {
+            // Modos partes/valor: objeto com ID e valor
+            participantes = {};
+            checkboxes.forEach(cb => {
+                const membroId = cb.value;
+                const input = cb.parentElement.querySelector('input[type="number"]');
+                const valorInput = input ? parseFloat(input.value) : (modoDivisao === 'partes' ? 1 : null);
+                participantes[membroId] = valorInput;
+            });
+        }
 
         // Validações
         if (!descricao) {
@@ -1507,9 +1728,35 @@ const UI = {
             return;
         }
 
-        if (participantes.length === 0) {
+        const numParticipantes = modoDivisao === 'igual'
+            ? participantes.length
+            : Object.keys(participantes).length;
+
+        if (numParticipantes === 0) {
             Utils.notificar('Por favor, selecione pelo menos um participante.');
             return;
+        }
+
+        // Validações específicas por modo
+        if (modoDivisao === 'partes') {
+            const partesInvalidas = Object.values(participantes).some(p => !p || p <= 0);
+            if (partesInvalidas) {
+                Utils.notificar('Por favor, informe um valor válido de partes para todos os participantes (maior que 0).');
+                return;
+            }
+        } else if (modoDivisao === 'valor') {
+            const valoresInvalidos = Object.values(participantes).some(v => !v || v <= 0);
+            if (valoresInvalidos) {
+                Utils.notificar('Por favor, informe um valor válido para todos os participantes.');
+                return;
+            }
+
+            // Verifica se a soma dos valores não excede o total
+            const somaValores = Object.values(participantes).reduce((sum, v) => sum + v, 0);
+            if (somaValores > valor) {
+                Utils.notificar(`A soma dos valores individuais (${Utils.formatarMoeda(somaValores)}) não pode ser maior que o valor total (${Utils.formatarMoeda(valor)}).`);
+                return;
+            }
         }
 
         if (AppState.editandoDespesa) {
@@ -1518,6 +1765,8 @@ const UI = {
             AppState.editandoDespesa.valor = valor;
             AppState.editandoDespesa.pagadorId = pagadorId;
             AppState.editandoDespesa.participantes = participantes;
+            AppState.editandoDespesa.timestamp = dataHora;
+            AppState.editandoDespesa.modoDivisao = modoDivisao;
         } else {
             // Criando
             const novaDespesa = {
@@ -1526,7 +1775,8 @@ const UI = {
                 valor: valor,
                 pagadorId: pagadorId,
                 participantes: participantes,
-                timestamp: Date.now()
+                timestamp: dataHora,
+                modoDivisao: modoDivisao
             };
             AppState.grupoAtivo.despesas.push(novaDespesa);
         }
@@ -1683,6 +1933,113 @@ const UI = {
 
     fecharModalDetalhamento() {
         document.getElementById('modalDetalhamento').classList.remove('active');
+    },
+
+    // ============================================
+    // Modo de Divisão
+    // ============================================
+
+    selecionarModoDivisao(modo) {
+        // Atualiza botões de modo
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-mode="${modo}"]`).classList.add('active');
+
+        // Atualiza descrição
+        const descricoes = {
+            'igual': 'Valor dividido igualmente entre os participantes',
+            'partes': 'Cada participante tem um peso/fração (ex: 0.5, 1, 2)',
+            'valor': 'Cada participante paga um valor fixo específico'
+        };
+        document.getElementById('modoDescricao').textContent = descricoes[modo];
+
+        // Re-renderiza a lista de participantes
+        this.renderizarParticipantesPorModo(modo);
+    },
+
+    renderizarParticipantesPorModo(modo) {
+        if (!AppState.grupoAtivo || AppState.grupoAtivo.membros.length === 0) return;
+
+        const container = document.getElementById('checkboxParticipantes');
+        const checkboxesAntigos = container.querySelectorAll('input[type="checkbox"]');
+        const valoresAntigos = {};
+
+        // Salva estados dos checkboxes e valores antes de re-renderizar
+        checkboxesAntigos.forEach(cb => {
+            const membroId = cb.value;
+            valoresAntigos[membroId] = {
+                checked: cb.checked,
+                valor: null
+            };
+
+            if (modo !== 'igual') {
+                const input = cb.parentElement.querySelector('input[type="number"]');
+                if (input) {
+                    valoresAntigos[membroId].valor = input.value;
+                }
+            }
+        });
+
+        container.innerHTML = '';
+
+        AppState.grupoAtivo.membros.forEach(membro => {
+            const item = document.createElement('div');
+            item.className = 'participante-item';
+
+            if (modo === 'igual') {
+                // Modo Igualitária: apenas checkbox
+                item.innerHTML = `
+                    <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
+                    <span style="flex: 1;">${membro.nome}</span>
+                `;
+            } else if (modo === 'partes') {
+                // Modo Por Partes: checkbox + input de partes
+                item.innerHTML = `
+                    <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
+                    <span style="flex: 1;">${membro.nome}</span>
+                    <input type="number"
+                           class="parte-input"
+                           data-membro="${membro.id}"
+                           step="0.1"
+                           min="0.1"
+                           placeholder="Partes"
+                           value="${valoresAntigos[membro.id]?.valor || '1'}"
+                           ${!valoresAntigos[membro.id]?.checked ? 'disabled' : ''}>
+                `;
+            } else if (modo === 'valor') {
+                // Modo Por Valor: checkbox + input de valor fixo
+                item.innerHTML = `
+                    <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
+                    <span style="flex: 1;">${membro.nome}</span>
+                    <input type="number"
+                           class="valor-input"
+                           data-membro="${membro.id}"
+                           step="0.01"
+                           min="0.01"
+                           placeholder="Valor"
+                           value="${valoresAntigos[membro.id]?.valor || ''}"
+                           ${!valoresAntigos[membro.id]?.checked ? 'disabled' : ''}>
+                `;
+            }
+
+            container.appendChild(item);
+
+            // Adiciona event listener para habilitar/desabilitar input ao marcar/desmarcar checkbox
+            if (modo !== 'igual') {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const numberInput = item.querySelector('input[type="number"]');
+
+                checkbox.addEventListener('change', () => {
+                    numberInput.disabled = !checkbox.checked;
+                    if (!checkbox.checked) {
+                        numberInput.value = '';
+                    } else if (modo === 'partes' && !numberInput.value) {
+                        numberInput.value = '1';
+                    }
+                });
+            }
+        });
     }
 };
 
