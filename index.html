@@ -903,6 +903,9 @@ const UI = {
         document.getElementById('btnCancelarDespesa').addEventListener('click', () => this.fecharModalDespesa());
         document.getElementById('btnSalvarDespesa').addEventListener('click', () => this.salvarDespesa());
 
+        // Atualiza prévia de valores quando o valor total muda
+        document.getElementById('inputValorDespesa').addEventListener('input', () => this.atualizarPreviaValores());
+
         // Botões de seleção de participantes
         document.getElementById('btnSelecionarTodos').addEventListener('click', () => {
             document.querySelectorAll('#checkboxParticipantes input[type="checkbox"]').forEach(cb => {
@@ -1118,31 +1121,55 @@ const UI = {
             return;
         }
 
-        container.innerHTML = '';
-        AppState.grupoAtivo.membros.forEach(membro => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-header">
-                    <h3 class="card-title">${membro.nome}</h3>
-                    <div class="card-actions">
-                        <button class="btn btn-small btn-secondary" onclick="UI.editarMembro('${membro.id}')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                            </svg>
-                        </button>
-                        <button class="btn btn-small btn-danger" onclick="UI.excluirMembro('${membro.id}')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
-                        </button>
+        // Ordena membros alfabeticamente
+        const membrosOrdenados = [...AppState.grupoAtivo.membros].sort((a, b) =>
+            a.nome.localeCompare(b.nome, 'pt-BR')
+        );
+
+        // Cria lista compacta
+        const lista = document.createElement('div');
+        lista.style.cssText = 'background:#fff;border-radius:1rem;padding:0;box-shadow:0 1px 2px 0 rgba(0,0,0,.05);border:1px solid var(--gray-200);overflow:hidden';
+
+        membrosOrdenados.forEach((membro, index) => {
+            const item = document.createElement('div');
+            item.style.cssText = `
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                padding:1rem 1.5rem;
+                ${index < membrosOrdenados.length - 1 ? 'border-bottom:1px solid var(--gray-200);' : ''}
+                transition:background 0.2s;
+            `;
+            item.onmouseenter = () => item.style.background = 'var(--gray-50)';
+            item.onmouseleave = () => item.style.background = 'transparent';
+
+            item.innerHTML = `
+                <div style="display:flex;align-items:center;gap:1rem;flex:1">
+                    <div style="width:40px;height:40px;border-radius:50%;background:var(--gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.125rem">
+                        ${membro.nome.charAt(0).toUpperCase()}
                     </div>
+                    <span style="font-weight:600;font-size:1.125rem;color:var(--gray-900)">${membro.nome}</span>
+                </div>
+                <div style="display:flex;gap:0.5rem">
+                    <button class="btn btn-small btn-secondary" onclick="UI.editarMembro('${membro.id}')" title="Editar membro">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-small btn-danger" onclick="UI.excluirMembro('${membro.id}')" title="Excluir membro">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
                 </div>
             `;
-            container.appendChild(card);
+            lista.appendChild(item);
         });
+
+        container.innerHTML = '';
+        container.appendChild(lista);
     },
 
     /**
@@ -1239,9 +1266,9 @@ const UI = {
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="card-info">
+                    <div class="card-info" style="padding: 0.75rem; background: var(--gray-50); border-radius: 0.5rem; margin-bottom: 0.75rem;">
                         <span class="card-info-label">Valor:</span>
-                        <span class="card-info-value valor">${Utils.formatarMoeda(despesa.valor)}</span>
+                        <span class="card-info-value" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">${Utils.formatarMoeda(despesa.valor)}</span>
                     </div>
                     <div class="card-info">
                         <span class="card-info-label">Pagador:</span>
@@ -2045,13 +2072,14 @@ const UI = {
             item.className = 'participante-item';
 
             if (modo === 'igual') {
-                // Modo Igualitária: apenas checkbox
+                // Modo Igualitária: apenas checkbox + prévia
                 item.innerHTML = `
                     <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
                     <span style="flex: 1;">${membro.nome}</span>
+                    <span class="previa-valor" data-membro="${membro.id}" style="font-size: 0.875rem; color: var(--gray-500); font-weight: 600;">-</span>
                 `;
             } else if (modo === 'partes') {
-                // Modo Por Partes: checkbox + input de partes
+                // Modo Por Partes: checkbox + input de partes + prévia
                 item.innerHTML = `
                     <input type="checkbox" name="participante" value="${membro.id}" ${valoresAntigos[membro.id]?.checked ? 'checked' : ''}>
                     <span style="flex: 1;">${membro.nome}</span>
@@ -2063,9 +2091,10 @@ const UI = {
                            placeholder="Partes"
                            value="${valoresAntigos[membro.id]?.valor || '1'}"
                            ${!valoresAntigos[membro.id]?.checked ? 'disabled' : ''}>
+                    <span class="previa-valor" data-membro="${membro.id}" style="font-size: 0.875rem; color: var(--gray-500); font-weight: 600; margin-left: 0.5rem;">-</span>
                 `;
             } else if (modo === 'valor') {
-                // Modo Por Valor: checkbox + input de valor fixo
+                // Modo Por Valor: checkbox + input de valor fixo (que será a prévia)
                 const valorDefault = valoresAntigos[membro.id]?.valor !== null && valoresAntigos[membro.id]?.valor !== undefined && valoresAntigos[membro.id]?.valor !== ''
                     ? valoresAntigos[membro.id].valor
                     : '';
@@ -2085,22 +2114,97 @@ const UI = {
 
             container.appendChild(item);
 
-            // Adiciona event listener para habilitar/desabilitar input ao marcar/desmarcar checkbox
-            if (modo !== 'igual') {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                const numberInput = item.querySelector('input[type="number"]');
+            // Adiciona event listeners
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const numberInput = item.querySelector('input[type="number"]');
 
-                checkbox.addEventListener('change', () => {
+            checkbox.addEventListener('change', () => {
+                if (numberInput) {
                     numberInput.disabled = !checkbox.checked;
                     if (!checkbox.checked) {
                         numberInput.value = '';
                     } else if (modo === 'partes' && !numberInput.value) {
                         numberInput.value = '1';
                     }
-                    // No modo 'valor', deixa vazio para o usuário preencher
+                }
+                this.atualizarPreviaValores();
+            });
+
+            if (numberInput) {
+                numberInput.addEventListener('input', () => {
+                    this.atualizarPreviaValores();
                 });
             }
         });
+
+        // Atualiza prévia inicial
+        this.atualizarPreviaValores();
+    },
+
+    atualizarPreviaValores() {
+        const inputValorTotal = document.getElementById('inputValorDespesa');
+        const valorTotal = parseFloat(inputValorTotal?.value) || 0;
+
+        if (valorTotal <= 0) {
+            document.querySelectorAll('.previa-valor').forEach(span => {
+                span.textContent = '-';
+                span.style.color = 'var(--gray-500)';
+            });
+            return;
+        }
+
+        const modoBtn = document.querySelector('.mode-btn.active');
+        const modo = modoBtn ? modoBtn.dataset.mode : 'igual';
+        const checkboxes = document.querySelectorAll('input[name="participante"]:checked');
+
+        if (modo === 'igual') {
+            const numParticipantes = checkboxes.length;
+            if (numParticipantes === 0) {
+                document.querySelectorAll('.previa-valor').forEach(span => {
+                    span.textContent = '-';
+                    span.style.color = 'var(--gray-500)';
+                });
+                return;
+            }
+
+            const valorPorPessoa = valorTotal / numParticipantes;
+            document.querySelectorAll('.previa-valor').forEach(span => {
+                const membroId = span.dataset.membro;
+                const cb = document.querySelector(`input[name="participante"][value="${membroId}"]`);
+                if (cb && cb.checked) {
+                    span.textContent = Utils.formatarMoeda(valorPorPessoa);
+                    span.style.color = 'var(--success)';
+                } else {
+                    span.textContent = '-';
+                    span.style.color = 'var(--gray-500)';
+                }
+            });
+        } else if (modo === 'partes') {
+            let totalPartes = 0;
+            const partesPorMembro = {};
+
+            checkboxes.forEach(cb => {
+                const membroId = cb.value;
+                const input = document.querySelector(`.parte-input[data-membro="${membroId}"]`);
+                const partes = parseFloat(input?.value) || 0;
+                partesPorMembro[membroId] = partes;
+                totalPartes += partes;
+            });
+
+            document.querySelectorAll('.previa-valor').forEach(span => {
+                const membroId = span.dataset.membro;
+                const cb = document.querySelector(`input[name="participante"][value="${membroId}"]`);
+                if (cb && cb.checked && totalPartes > 0) {
+                    const partes = partesPorMembro[membroId] || 0;
+                    const valorProporcional = (partes / totalPartes) * valorTotal;
+                    span.textContent = Utils.formatarMoeda(valorProporcional);
+                    span.style.color = 'var(--success)';
+                } else {
+                    span.textContent = '-';
+                    span.style.color = 'var(--gray-500)';
+                }
+            });
+        }
     }
 };
 
