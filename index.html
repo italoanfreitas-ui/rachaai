@@ -29,8 +29,7 @@
                 <select id="activeGroupSelect" class="group-select">
                     <option value="">Selecione um grupo</option>
                 </select>
-                <input type="file" id="inputImportarGrupos" accept=".json" multiple style="display:none;">
-                <button id="btnImportarGrupos" class="btn btn-secondary btn-small" style="white-space:nowrap;" title="Importar grupos (selecione arquivos JSON)">
+                <button id="btnImportarGrupos" class="btn btn-secondary btn-small" style="white-space:nowrap;" title="Importar grupos do GitHub (pasta gruposonline/)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
                         <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
                         <polyline points="9 14 12 11 15 14"/>
@@ -811,7 +810,7 @@ const PDFGenerator = {
 
         // Estatísticas em destaque (menores)
         html += `
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem;page-break-after:avoid;">
                 <div style="background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);border:2px solid #0ea5e9;padding:0.75rem;border-radius:8px;text-align:center;">
                     <div style="font-size:0.625rem;color:#0c4a6e;font-weight:600;text-transform:uppercase;margin-bottom:0.25rem;">Total Gasto</div>
                     <div style="font-size:1.25rem;font-weight:800;color:#0369a1;">${Utils.formatarMoeda(totalDespesas)}</div>
@@ -1302,7 +1301,7 @@ const UI = {
 
         // Cria grid responsivo (usa CSS para responsividade real)
         const grid = document.createElement('div');
-        grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.875rem';
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.875rem';
 
         membrosOrdenados.forEach((membro) => {
             const card = document.createElement('div');
@@ -1896,31 +1895,12 @@ const UI = {
                         });
                     } else {
                         // Formato novo (objeto com valores)
-                        // Primeiro, precisamos calcular quais valores são auto-calculados
-                        const participantesIds = Object.keys(AppState.editandoDespesa.participantes);
-                        const valorTotal = AppState.editandoDespesa.valor;
-
-                        // Se modo valor, detecta valores manuais vs auto
+                        // Se modo valor, usa metadata de valores manuais (se existir)
                         let valoresManuais = new Set();
                         if (modo === 'valor') {
-                            // Calcula o valor padrão se tudo fosse dividido igualmente
-                            const valorIgual = valorTotal / participantesIds.length;
-
-                            Object.entries(AppState.editandoDespesa.participantes).forEach(([pId, valor]) => {
-                                // Se o valor é diferente do padrão, considera como manual
-                                // Usa tolerância para arredondamentos
-                                if (Math.abs(valor - valorIgual) > 0.01) {
-                                    valoresManuais.add(pId);
-                                }
-                            });
-
-                            // Se apenas alguns têm valores diferentes, esses são os manuais
-                            // Os outros são auto-calculados
-                            if (valoresManuais.size > 0 && valoresManuais.size < participantesIds.length) {
-                                // Ok, temos separação clara
-                            } else {
-                                // Não dá pra distinguir, considera todos como manuais
-                                participantesIds.forEach(pId => valoresManuais.add(pId));
+                            // Usa metadata armazenada se disponível
+                            if (AppState.editandoDespesa.valoresManuais && Array.isArray(AppState.editandoDespesa.valoresManuais)) {
+                                AppState.editandoDespesa.valoresManuais.forEach(pId => valoresManuais.add(pId));
                             }
                         }
 
@@ -1934,16 +1914,15 @@ const UI = {
                                         if (modo === 'valor') {
                                             const valorArredondado = Math.round(valor * 100) / 100;
 
-                                            // Se é valor manual: preenche e marca
-                                            // Se é auto: deixa vazio e usa placeholder
+                                            // Se é valor manual: preenche com valor
+                                            // Se é auto: preenche com valor mas sem data-manual
                                             if (valoresManuais.has(pId)) {
                                                 input.value = valorArredondado;
                                                 input.setAttribute('data-manual', 'true');
                                                 input.style.color = 'var(--gray-900)';
                                                 input.style.fontWeight = '700';
                                             } else {
-                                                input.value = '';
-                                                input.placeholder = Utils.formatarMoeda(valorArredondado);
+                                                input.value = valorArredondado;
                                                 input.removeAttribute('data-manual');
                                                 input.style.color = 'var(--gray-500)';
                                                 input.style.fontWeight = '400';
@@ -2090,6 +2069,21 @@ const UI = {
             }
         }
 
+        // Para modo "valor", armazena quais valores são manuais
+        let valoresManuais = [];
+        if (modoDivisao === 'valor') {
+            checkboxes.forEach(cb => {
+                const membroId = cb.value;
+                const input = cb.parentElement.querySelector('input[type="number"]');
+                const valorInput = input && input.value ? parseFloat(input.value) : 0;
+
+                // Considera manual se tem data-manual ou se tem valor preenchido
+                if (valorInput > 0 && (input.hasAttribute('data-manual') || input.value !== '')) {
+                    valoresManuais.push(membroId);
+                }
+            });
+        }
+
         if (AppState.editandoDespesa) {
             // Editando
             AppState.editandoDespesa.descricao = descricao;
@@ -2098,6 +2092,7 @@ const UI = {
             AppState.editandoDespesa.participantes = participantes;
             AppState.editandoDespesa.timestamp = dataHora;
             AppState.editandoDespesa.modoDivisao = modoDivisao;
+            AppState.editandoDespesa.valoresManuais = valoresManuais;
         } else {
             // Criando
             const novaDespesa = {
@@ -2107,7 +2102,8 @@ const UI = {
                 pagadorId: pagadorId,
                 participantes: participantes,
                 timestamp: dataHora,
-                modoDivisao: modoDivisao
+                modoDivisao: modoDivisao,
+                valoresManuais: valoresManuais
             };
             AppState.grupoAtivo.despesas.push(novaDespesa);
         }
@@ -2751,9 +2747,9 @@ const UI = {
                 const membroId = cb.value;
                 const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
 
-                // Verifica se tem valor definido manualmente (value preenchido ou data-manual)
+                // Verifica se tem data-manual (valores que o usuário definiu explicitamente)
                 const valorInput = input ? parseFloat(input.value) : 0;
-                const isManual = input?.hasAttribute('data-manual') || (valorInput > 0 && input.value !== '');
+                const isManual = input?.hasAttribute('data-manual');
 
                 if (isManual && valorInput > 0) {
                     // Tem valor manual
@@ -2775,20 +2771,19 @@ const UI = {
                 ? remanescente / participantesSemValor.length
                 : 0;
 
-            // Atualiza valores auto-calculados (usa placeholder, não value)
+            // Atualiza valores auto-calculados
             participantesSemValor.forEach(membroId => {
                 const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
                 if (input) {
                     if (valorRemanescente > 0) {
-                        // Valores auto: placeholder com R$, cinza, sem negrito
-                        input.value = '';
-                        input.placeholder = Utils.formatarMoeda(valorRemanescente);
+                        // Valores auto: valor preenchido com R$, cinza, sem negrito
+                        const valorArredondado = Math.round(valorRemanescente * 100) / 100;
+                        input.value = valorArredondado;
                         input.style.color = 'var(--gray-500)';
                         input.style.fontWeight = '400';
                         input.removeAttribute('data-manual');
                     } else {
                         input.value = '';
-                        input.placeholder = 'Valor (R$)';
                         input.style.color = 'var(--gray-500)';
                         input.style.fontWeight = '400';
                         input.removeAttribute('data-manual');
@@ -2812,96 +2807,108 @@ const UI = {
     },
 
     /**
-     * Importa grupos de arquivos JSON selecionados pelo usuário
+     * Importa grupos de JSONs do GitHub (main branch, pasta gruposonline/)
      */
-    async importarGruposDeArquivos(files) {
-        if (!files || files.length === 0) {
-            Utils.notificar('Nenhum arquivo selecionado.');
-            return;
-        }
+    async importarGruposDeGitHub() {
+        try {
+            Utils.notificar('🔄 Buscando grupos do GitHub...');
 
-        const gruposImportados = [];
-        let erros = 0;
+            // Lista arquivos na pasta gruposonline do GitHub
+            const repoUrl = 'https://api.github.com/repos/italoanfreitas-ui/rachaai/contents/gruposonline';
+            const response = await fetch(repoUrl);
 
-        for (const file of files) {
-            try {
-                // Verifica se é um arquivo JSON
-                if (!file.name.endsWith('.json')) {
+            if (!response.ok) {
+                throw new Error(`Erro ao acessar GitHub: ${response.status}`);
+            }
+
+            const files = await response.json();
+
+            // Filtra apenas arquivos JSON
+            const jsonFiles = files.filter(file => file.name.endsWith('.json') && file.type === 'file');
+
+            if (jsonFiles.length === 0) {
+                Utils.notificar('⚠️ Nenhum arquivo JSON encontrado na pasta gruposonline.');
+                return;
+            }
+
+            const gruposImportados = [];
+            let erros = 0;
+
+            // Busca cada arquivo JSON
+            for (const file of jsonFiles) {
+                try {
+                    // Usa raw.githubusercontent.com para buscar o conteúdo
+                    const rawUrl = `https://raw.githubusercontent.com/italoanfreitas-ui/rachaai/main/gruposonline/${file.name}`;
+                    const fileResponse = await fetch(rawUrl);
+
+                    if (!fileResponse.ok) {
+                        console.error(`Erro ao buscar ${file.name}: ${fileResponse.status}`);
+                        erros++;
+                        continue;
+                    }
+
+                    const fileContent = await fileResponse.text();
+                    const grupoData = JSON.parse(fileContent);
+
+                    // Valida estrutura básica
+                    if (!grupoData.nome || !grupoData.membros || !grupoData.despesas) {
+                        console.error(`Arquivo ${file.name} não tem estrutura válida`);
+                        erros++;
+                        continue;
+                    }
+
+                    // Verifica se já existe um grupo com esse nome
+                    const grupoExistente = AppState.grupos.find(g => g.nome === grupoData.nome);
+                    if (grupoExistente) {
+                        // Atualiza o grupo existente
+                        grupoExistente.reducaoTransacoes = grupoData.reducaoTransacoes;
+                        grupoExistente.membros = grupoData.membros;
+                        grupoExistente.despesas = grupoData.despesas;
+                        gruposImportados.push(grupoData.nome);
+                    } else {
+                        // Cria novo grupo
+                        const novoGrupo = {
+                            id: Utils.gerarId(),
+                            nome: grupoData.nome,
+                            reducaoTransacoes: grupoData.reducaoTransacoes || false,
+                            membros: grupoData.membros || [],
+                            despesas: grupoData.despesas || []
+                        };
+                        AppState.grupos.push(novoGrupo);
+                        gruposImportados.push(grupoData.nome);
+                    }
+                } catch (error) {
+                    console.error(`Erro ao processar ${file.name}:`, error);
                     erros++;
-                    continue;
                 }
+            }
 
-                // Lê o arquivo
-                const fileContent = await this.lerArquivo(file);
-                const grupoData = JSON.parse(fileContent);
+            if (gruposImportados.length > 0) {
+                Storage.salvar();
+                this.renderizarListaGrupos();
 
-                // Valida estrutura básica
-                if (!grupoData.nome || !grupoData.membros || !grupoData.despesas) {
-                    console.error(`Arquivo ${file.name} não tem estrutura válida`);
-                    erros++;
-                    continue;
-                }
-
-                // Verifica se já existe um grupo com esse nome
-                const grupoExistente = AppState.grupos.find(g => g.nome === grupoData.nome);
-                if (grupoExistente) {
-                    // Atualiza o grupo existente
-                    grupoExistente.reducaoTransacoes = grupoData.reducaoTransacoes;
-                    grupoExistente.membros = grupoData.membros;
-                    grupoExistente.despesas = grupoData.despesas;
-                    gruposImportados.push(grupoData.nome);
+                // Se foi importado apenas um grupo, seleciona automaticamente
+                if (gruposImportados.length === 1) {
+                    const grupoImportado = AppState.grupos.find(g => g.nome === gruposImportados[0]);
+                    if (grupoImportado) {
+                        AppState.grupoAtivo = grupoImportado;
+                        Storage.salvar();
+                        this.atualizarSeletorGrupo();
+                        this.renderizar();
+                        Utils.notificar(`✅ Grupo "${gruposImportados[0]}" importado e selecionado!`);
+                    }
                 } else {
-                    // Cria novo grupo
-                    const novoGrupo = {
-                        id: Utils.gerarId(),
-                        nome: grupoData.nome,
-                        reducaoTransacoes: grupoData.reducaoTransacoes || false,
-                        membros: grupoData.membros || [],
-                        despesas: grupoData.despesas || []
-                    };
-                    AppState.grupos.push(novoGrupo);
-                    gruposImportados.push(grupoData.nome);
+                    Utils.notificar(`✅ ${gruposImportados.length} grupos importados: ${gruposImportados.join(', ')}`);
                 }
-            } catch (error) {
-                console.error(`Erro ao importar ${file.name}:`, error);
-                erros++;
             }
-        }
 
-        if (gruposImportados.length > 0) {
-            Storage.salvar();
-            this.renderizarListaGrupos();
-
-            // Se foi importado apenas um grupo, seleciona automaticamente
-            if (gruposImportados.length === 1) {
-                const grupoImportado = AppState.grupos.find(g => g.nome === gruposImportados[0]);
-                if (grupoImportado) {
-                    AppState.grupoAtivo = grupoImportado;
-                    Storage.salvar();
-                    this.atualizarSeletorGrupo();
-                    this.renderizar();
-                    Utils.notificar(`✅ Grupo "${gruposImportados[0]}" importado e selecionado!`);
-                }
-            } else {
-                Utils.notificar(`✅ ${gruposImportados.length} grupos importados: ${gruposImportados.join(', ')}`);
+            if (erros > 0) {
+                Utils.notificar(`⚠️ ${erros} arquivo(s) não puderam ser importados.`);
             }
+        } catch (error) {
+            console.error('Erro ao importar do GitHub:', error);
+            Utils.notificar(`❌ Erro ao importar do GitHub: ${error.message}`);
         }
-
-        if (erros > 0) {
-            Utils.notificar(`⚠️ ${erros} arquivo(s) não puderam ser importados.`);
-        }
-    },
-
-    /**
-     * Lê um arquivo como texto
-     */
-    lerArquivo(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = (e) => reject(e);
-            reader.readAsText(file);
-        });
     }
 };
 
@@ -2930,20 +2937,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Botão e input para importar grupos
+    // Botão para importar grupos do GitHub
     const btnImportarGrupos = document.getElementById('btnImportarGrupos');
-    const inputImportarGrupos = document.getElementById('inputImportarGrupos');
 
     btnImportarGrupos.addEventListener('click', () => {
-        inputImportarGrupos.click();
-    });
-
-    inputImportarGrupos.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-            UI.importarGruposDeArquivos(e.target.files);
-            // Limpa o input para permitir selecionar o mesmo arquivo novamente
-            e.target.value = '';
-        }
+        UI.importarGruposDeGitHub();
     });
 });
 </script></body></html>
