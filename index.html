@@ -412,10 +412,92 @@ const Utils = {
     },
 
     /**
-     * Mostra uma notificação (alert simplificado)
+     * Mostra uma notificação toast
      */
-    notificar(mensagem) {
-        alert(mensagem);
+    notificar(mensagem, duracao = 4000) {
+        // Cria container de toasts se não existir
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.style.cssText = 'position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:0.75rem;max-width:400px;';
+            document.body.appendChild(container);
+        }
+
+        // Cria o toast
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            font-weight: 600;
+            font-size: 0.9375rem;
+            line-height: 1.5;
+            animation: slideIn 0.3s ease-out;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            max-width: 400px;
+            word-wrap: break-word;
+        `;
+        toast.textContent = mensagem;
+
+        // Adiciona animação de entrada
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(450px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(450px);
+                    opacity: 0;
+                }
+            }
+        `;
+        if (!document.getElementById('toastStyles')) {
+            styleSheet.id = 'toastStyles';
+            document.head.appendChild(styleSheet);
+        }
+
+        // Adiciona hover
+        toast.onmouseenter = () => {
+            toast.style.transform = 'translateX(-4px)';
+            toast.style.boxShadow = '0 20px 35px -5px rgba(0,0,0,0.4)';
+        };
+        toast.onmouseleave = () => {
+            toast.style.transform = 'translateX(0)';
+            toast.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.3)';
+        };
+
+        // Clique para fechar
+        toast.onclick = () => {
+            toast.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => toast.remove(), 300);
+        };
+
+        // Adiciona ao container
+        container.appendChild(toast);
+
+        // Remove automaticamente após a duração
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }
+        }, duracao);
     }
 };
 
@@ -1301,7 +1383,7 @@ const UI = {
 
         // Cria grid responsivo (usa CSS para responsividade real)
         const grid = document.createElement('div');
-        grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.875rem';
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0.875rem';
 
         membrosOrdenados.forEach((membro) => {
             const card = document.createElement('div');
@@ -1901,6 +1983,26 @@ const UI = {
                             // Usa metadata armazenada se disponível
                             if (AppState.editandoDespesa.valoresManuais && Array.isArray(AppState.editandoDespesa.valoresManuais)) {
                                 AppState.editandoDespesa.valoresManuais.forEach(pId => valoresManuais.add(pId));
+                            } else {
+                                // Sem metadata: tenta inferir baseado nos valores
+                                // Se todos os valores são iguais, nenhum é manual
+                                // Se alguns diferem, os que diferem da divisão igual são manuais
+                                const participantesIds = Object.keys(AppState.editandoDespesa.participantes);
+                                const valores = Object.values(AppState.editandoDespesa.participantes);
+                                const valorIgual = AppState.editandoDespesa.valor / participantesIds.length;
+
+                                // Verifica se todos são iguais (tolerância de 0.01)
+                                const todosIguais = valores.every(v => Math.abs(v - valorIgual) < 0.01);
+
+                                if (!todosIguais) {
+                                    // Há valores diferentes - os que diferem são manuais
+                                    Object.entries(AppState.editandoDespesa.participantes).forEach(([pId, valor]) => {
+                                        if (Math.abs(valor - valorIgual) >= 0.01) {
+                                            valoresManuais.add(pId);
+                                        }
+                                    });
+                                }
+                                // Se todosIguais = true, valoresManuais fica vazio (todos auto)
                             }
                         }
 
@@ -2075,10 +2177,10 @@ const UI = {
             checkboxes.forEach(cb => {
                 const membroId = cb.value;
                 const input = cb.parentElement.querySelector('input[type="number"]');
-                const valorInput = input && input.value ? parseFloat(input.value) : 0;
 
-                // Considera manual se tem data-manual ou se tem valor preenchido
-                if (valorInput > 0 && (input.hasAttribute('data-manual') || input.value !== '')) {
+                // Considera manual APENAS se tem o atributo data-manual
+                // (que é setado quando usuário digita)
+                if (input && input.hasAttribute('data-manual')) {
                     valoresManuais.push(membroId);
                 }
             });
@@ -2885,7 +2987,7 @@ const UI = {
 
             if (gruposImportados.length > 0) {
                 Storage.salvar();
-                this.renderizarListaGrupos();
+                this.renderizarGrupos();
 
                 // Se foi importado apenas um grupo, seleciona automaticamente
                 if (gruposImportados.length === 1) {
