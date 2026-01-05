@@ -2912,8 +2912,9 @@ const UI = {
      * Importa grupos de JSONs do GitHub (main branch, pasta gruposonline/)
      */
     async importarGruposDeGitHub() {
+        console.log('[IMPORT v3.0 - 2025-01-05] Função corrigida - todas as chamadas validadas');
         try {
-            Utils.notificar('🔄 Buscando grupos do GitHub...');
+            Utils.notificar('🔄 Buscando grupos do GitHub... (v3.0)');
 
             // Lista arquivos na pasta gruposonline do GitHub
             const repoUrl = 'https://api.github.com/repos/italoanfreitas-ui/rachaai/contents/gruposonline';
@@ -2995,12 +2996,14 @@ const UI = {
                     if (grupoImportado) {
                         AppState.grupoAtivo = grupoImportado;
                         Storage.salvar();
+                        console.log('[IMPORT] Atualizando seletor de grupos');
                         this.atualizarSeletorGrupos();
-                        // Renderiza todas as seções
+                        console.log('[IMPORT] Renderizando seções individuais');
                         this.renderizarMembros();
                         this.renderizarDespesas();
                         this.renderizarResumo();
                         this.renderizarLiquidacao();
+                        console.log('[IMPORT] Importação concluída com sucesso');
                         Utils.notificar(`✅ Grupo "${gruposImportados[0]}" importado e selecionado!`);
                     }
                 } else {
