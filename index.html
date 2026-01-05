@@ -2995,7 +2995,7 @@ const UI = {
                     if (grupoImportado) {
                         AppState.grupoAtivo = grupoImportado;
                         Storage.salvar();
-                        this.atualizarSeletorGrupo();
+                        this.atualizarSeletorGrupos();
                         this.renderizar();
                         Utils.notificar(`✅ Grupo "${gruposImportados[0]}" importado e selecionado!`);
                     }
