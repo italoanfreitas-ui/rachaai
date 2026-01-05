@@ -2996,7 +2996,11 @@ const UI = {
                         AppState.grupoAtivo = grupoImportado;
                         Storage.salvar();
                         this.atualizarSeletorGrupos();
-                        this.renderizar();
+                        // Renderiza todas as seções
+                        this.renderizarMembros();
+                        this.renderizarDespesas();
+                        this.renderizarResumo();
+                        this.renderizarLiquidacao();
                         Utils.notificar(`✅ Grupo "${gruposImportados[0]}" importado e selecionado!`);
                     }
                 } else {
