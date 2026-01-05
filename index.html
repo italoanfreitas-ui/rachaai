@@ -29,13 +29,14 @@
                 <select id="activeGroupSelect" class="group-select">
                     <option value="">Selecione um grupo</option>
                 </select>
-                <button id="btnImportarGrupos" class="btn btn-secondary btn-small" style="white-space:nowrap;" title="Importar grupos da nuvem">
+                <input type="file" id="inputImportarGrupos" accept=".json" multiple style="display:none;">
+                <button id="btnImportarGrupos" class="btn btn-secondary btn-small" style="white-space:nowrap;" title="Importar grupos (selecione arquivos JSON)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
                         <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
                         <polyline points="9 14 12 11 15 14"/>
                         <line x1="12" y1="11" x2="12" y2="21"/>
                     </svg>
-                    Importar da Nuvem
+                    Importar
                 </button>
             </div>
         </div>
@@ -1620,19 +1621,19 @@ const UI = {
             item.className = 'liquidacao-item';
             item.style.cursor = 'pointer';
             item.innerHTML = `
-                <div style="flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: var(--gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem;">
+                <div style="flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: var(--gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; align-self: center;">
                     ${index + 1}
                 </div>
-                <div style="flex: 1; min-width: 0;">
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
                     <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600;">De</div>
                     <div style="font-size: 1.125rem; font-weight: 700; color: var(--gray-900); line-height: 1.2;">${transacao.de}</div>
                 </div>
-                <div style="flex: 0 0 auto; font-size: 1.875rem; color: var(--primary); font-weight: 700; display: flex; align-items: center; line-height: 1; padding: 0 0.5rem;">→</div>
-                <div style="flex: 1; min-width: 0;">
+                <div style="flex: 0 0 auto; font-size: 1.875rem; color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0 0.5rem; align-self: center;">→</div>
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
                     <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600;">Para</div>
                     <div style="font-size: 1.125rem; font-weight: 700; color: var(--gray-900); line-height: 1.2;">${transacao.para}</div>
                 </div>
-                <div style="flex: 0 0 auto; text-align: right; min-width: 100px;">
+                <div style="flex: 0 0 auto; text-align: right; min-width: 100px; display: flex; flex-direction: column; justify-content: center;">
                     <div style="font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600;">Valor</div>
                     <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1.2;">${Utils.formatarMoeda(transacao.valor)}</div>
                 </div>
@@ -1932,20 +1933,21 @@ const UI = {
                                     if (input) {
                                         if (modo === 'valor') {
                                             const valorArredondado = Math.round(valor * 100) / 100;
-                                            const valorFormatado = Utils.formatarMoeda(valorArredondado);
 
-                                            // Se é valor manual: negrito e cor normal
-                                            // Se é auto: cinza e sem negrito
+                                            // Se é valor manual: preenche e marca
+                                            // Se é auto: deixa vazio e usa placeholder
                                             if (valoresManuais.has(pId)) {
-                                                input.value = valorFormatado;
+                                                input.value = valorArredondado;
+                                                input.setAttribute('data-manual', 'true');
                                                 input.style.color = 'var(--gray-900)';
                                                 input.style.fontWeight = '700';
                                             } else {
-                                                input.value = valorFormatado;
+                                                input.value = '';
+                                                input.placeholder = Utils.formatarMoeda(valorArredondado);
+                                                input.removeAttribute('data-manual');
                                                 input.style.color = 'var(--gray-500)';
                                                 input.style.fontWeight = '400';
                                             }
-                                            input.setAttribute('data-valor-real', valorArredondado);
                                         } else {
                                             // Modo "partes": preenche normalmente
                                             input.value = valor;
@@ -2011,12 +2013,8 @@ const UI = {
                 const membroId = cb.value;
                 const input = cb.parentElement.querySelector('input[type="number"]');
 
-                // Extrai valor numérico (pode estar formatado como "R$ XX,XX" ou número puro)
-                let valorInput = 0;
-                if (input?.value) {
-                    const valorStr = input.value.toString().replace(/[^\d,.-]/g, '').replace(',', '.');
-                    valorInput = parseFloat(valorStr) || 0;
-                }
+                // Verifica se tem valor preenchido
+                const valorInput = input && input.value ? parseFloat(input.value) : 0;
 
                 if (valorInput > 0) {
                     participantesComValor.push({ id: membroId, valor: valorInput });
@@ -2322,12 +2320,12 @@ const UI = {
         titulo.textContent = 'Por que esse pagamento?';
 
         let html = `
-            <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-                <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem;">💸 Transação</div>
-                <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+                <div style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: #ffffff;">💸 Transação</div>
+                <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #ffffff;">
                     ${devedor.nome} → ${credor.nome}
                 </div>
-                <div style="font-size: 2rem; font-weight: 800; opacity: 0.95;">
+                <div style="font-size: 2rem; font-weight: 800; opacity: 0.95; color: #ffffff;">
                     ${Utils.formatarMoeda(valorTotal)}
                 </div>
             </div>
@@ -2664,6 +2662,12 @@ const UI = {
 
             if (numberInput) {
                 numberInput.addEventListener('input', () => {
+                    // Se é modo valor e usuário digitou, marca como manual
+                    if (modo === 'valor' && numberInput.value) {
+                        numberInput.setAttribute('data-manual', 'true');
+                        numberInput.style.color = 'var(--gray-900)';
+                        numberInput.style.fontWeight = '700';
+                    }
                     this.atualizarPreviaValores();
                 });
             }
@@ -2747,25 +2751,20 @@ const UI = {
                 const membroId = cb.value;
                 const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
 
-                // Extrai valor numérico (pode estar formatado como "R$ XX,XX" ou número puro)
-                let valorPersonalizado = 0;
-                if (input?.value) {
-                    const valorStr = input.value.toString().replace(/[^\d,.-]/g, '').replace(',', '.');
-                    valorPersonalizado = parseFloat(valorStr) || 0;
-                }
+                // Verifica se tem valor definido manualmente (value preenchido ou data-manual)
+                const valorInput = input ? parseFloat(input.value) : 0;
+                const isManual = input?.hasAttribute('data-manual') || (valorInput > 0 && input.value !== '');
 
-                if (valorPersonalizado > 0) {
-                    // Tem valor personalizado (definido manualmente)
-                    valoresPorMembro[membroId] = valorPersonalizado;
-                    somaPersonalizados += valorPersonalizado;
+                if (isManual && valorInput > 0) {
+                    // Tem valor manual
+                    valoresPorMembro[membroId] = valorInput;
+                    somaPersonalizados += valorInput;
 
-                    // Marca visualmente como manual: negrito e cor escura
-                    input.value = Utils.formatarMoeda(valorPersonalizado);
+                    // Estilo manual: negrito, cor escura
                     input.style.color = 'var(--gray-900)';
                     input.style.fontWeight = '700';
-                    input.setAttribute('data-manual', 'true');
                 } else {
-                    // Sem valor personalizado - receberá parte do remanescente
+                    // Sem valor manual - receberá parte do remanescente
                     participantesSemValor.push(membroId);
                 }
             });
@@ -2776,21 +2775,24 @@ const UI = {
                 ? remanescente / participantesSemValor.length
                 : 0;
 
-            // Atualiza valores auto-calculados
+            // Atualiza valores auto-calculados (usa placeholder, não value)
             participantesSemValor.forEach(membroId => {
                 const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
-                if (input && valorRemanescente > 0) {
-                    // Valores auto: cinza, sem negrito, com R$
-                    input.value = Utils.formatarMoeda(valorRemanescente);
-                    input.style.color = 'var(--gray-500)';
-                    input.style.fontWeight = '400';
-                    input.removeAttribute('data-manual');
-                } else if (input) {
-                    input.value = '';
-                    input.placeholder = 'Valor';
-                    input.style.color = 'var(--gray-500)';
-                    input.style.fontWeight = '400';
-                    input.removeAttribute('data-manual');
+                if (input) {
+                    if (valorRemanescente > 0) {
+                        // Valores auto: placeholder com R$, cinza, sem negrito
+                        input.value = '';
+                        input.placeholder = Utils.formatarMoeda(valorRemanescente);
+                        input.style.color = 'var(--gray-500)';
+                        input.style.fontWeight = '400';
+                        input.removeAttribute('data-manual');
+                    } else {
+                        input.value = '';
+                        input.placeholder = 'Valor (R$)';
+                        input.style.color = 'var(--gray-500)';
+                        input.style.fontWeight = '400';
+                        input.removeAttribute('data-manual');
+                    }
                 }
             });
 
@@ -2800,7 +2802,7 @@ const UI = {
                 const input = document.querySelector(`.valor-input[data-membro="${membroId}"]`);
                 if (input) {
                     input.value = '';
-                    input.placeholder = 'Valor';
+                    input.placeholder = 'Valor (R$)';
                     input.style.color = 'var(--gray-500)';
                     input.style.fontWeight = '400';
                     input.removeAttribute('data-manual');
@@ -2810,92 +2812,96 @@ const UI = {
     },
 
     /**
-     * Importa grupos da pasta gruposonline no repositório
+     * Importa grupos de arquivos JSON selecionados pelo usuário
      */
-    async importarGruposOnline() {
-        try {
-            // Lista de arquivos JSON na pasta gruposonline
-            const arquivos = [
-                'racha-ai-reveillon (1).json'
-            ];
-
-            const gruposImportados = [];
-            let erros = 0;
-
-            // Calcula o caminho base relativo para a pasta gruposonline
-            const currentPath = window.location.pathname;
-            const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-            const baseURL = window.location.origin + basePath + 'gruposonline/';
-
-            for (const arquivo of arquivos) {
-                try {
-                    // Tenta buscar o arquivo
-                    const response = await fetch(baseURL + encodeURIComponent(arquivo));
-
-                    if (!response.ok) {
-                        console.error(`Erro ao buscar ${arquivo}: ${response.status}`);
-                        erros++;
-                        continue;
-                    }
-
-                    const grupoData = await response.json();
-
-                    // Valida estrutura básica
-                    if (!grupoData.nome || !grupoData.membros || !grupoData.despesas) {
-                        erros++;
-                        continue;
-                    }
-
-                    // Verifica se já existe um grupo com esse nome
-                    const grupoExistente = AppState.grupos.find(g => g.nome === grupoData.nome);
-                    if (grupoExistente) {
-                        // Atualiza o grupo existente
-                        grupoExistente.reducaoTransacoes = grupoData.reducaoTransacoes;
-                        grupoExistente.membros = grupoData.membros;
-                        grupoExistente.despesas = grupoData.despesas;
-                        gruposImportados.push(grupoData.nome);
-                    } else {
-                        // Cria novo grupo
-                        const novoGrupo = {
-                            id: Utils.gerarId(),
-                            nome: grupoData.nome,
-                            reducaoTransacoes: grupoData.reducaoTransacoes || false,
-                            membros: grupoData.membros || [],
-                            despesas: grupoData.despesas || []
-                        };
-                        AppState.grupos.push(novoGrupo);
-                        gruposImportados.push(grupoData.nome);
-                    }
-                } catch (error) {
-                    console.error(`Erro ao importar ${arquivo}:`, error);
-                    erros++;
-                }
-            }
-
-            if (gruposImportados.length > 0) {
-                Storage.salvar();
-                this.renderizarListaGrupos();
-
-                // Se foi importado apenas um grupo, seleciona automaticamente
-                if (gruposImportados.length === 1) {
-                    const grupoImportado = AppState.grupos.find(g => g.nome === gruposImportados[0]);
-                    if (grupoImportado) {
-                        AppState.grupoAtivo = grupoImportado;
-                        Storage.salvar();
-                        this.atualizarSeletorGrupo();
-                        this.renderizar();
-                        Utils.notificar(`✅ Grupo "${gruposImportados[0]}" importado e selecionado!`);
-                    }
-                } else {
-                    Utils.notificar(`✅ ${gruposImportados.length} grupos importados: ${gruposImportados.join(', ')}`);
-                }
-            } else if (erros > 0) {
-                Utils.notificar('⚠️ Não foi possível importar os grupos. Verifique se os arquivos estão disponíveis na pasta gruposonline.');
-            }
-        } catch (error) {
-            console.error('Erro ao importar grupos:', error);
-            Utils.notificar('❌ Erro ao importar grupos online. Tente novamente mais tarde.');
+    async importarGruposDeArquivos(files) {
+        if (!files || files.length === 0) {
+            Utils.notificar('Nenhum arquivo selecionado.');
+            return;
         }
+
+        const gruposImportados = [];
+        let erros = 0;
+
+        for (const file of files) {
+            try {
+                // Verifica se é um arquivo JSON
+                if (!file.name.endsWith('.json')) {
+                    erros++;
+                    continue;
+                }
+
+                // Lê o arquivo
+                const fileContent = await this.lerArquivo(file);
+                const grupoData = JSON.parse(fileContent);
+
+                // Valida estrutura básica
+                if (!grupoData.nome || !grupoData.membros || !grupoData.despesas) {
+                    console.error(`Arquivo ${file.name} não tem estrutura válida`);
+                    erros++;
+                    continue;
+                }
+
+                // Verifica se já existe um grupo com esse nome
+                const grupoExistente = AppState.grupos.find(g => g.nome === grupoData.nome);
+                if (grupoExistente) {
+                    // Atualiza o grupo existente
+                    grupoExistente.reducaoTransacoes = grupoData.reducaoTransacoes;
+                    grupoExistente.membros = grupoData.membros;
+                    grupoExistente.despesas = grupoData.despesas;
+                    gruposImportados.push(grupoData.nome);
+                } else {
+                    // Cria novo grupo
+                    const novoGrupo = {
+                        id: Utils.gerarId(),
+                        nome: grupoData.nome,
+                        reducaoTransacoes: grupoData.reducaoTransacoes || false,
+                        membros: grupoData.membros || [],
+                        despesas: grupoData.despesas || []
+                    };
+                    AppState.grupos.push(novoGrupo);
+                    gruposImportados.push(grupoData.nome);
+                }
+            } catch (error) {
+                console.error(`Erro ao importar ${file.name}:`, error);
+                erros++;
+            }
+        }
+
+        if (gruposImportados.length > 0) {
+            Storage.salvar();
+            this.renderizarListaGrupos();
+
+            // Se foi importado apenas um grupo, seleciona automaticamente
+            if (gruposImportados.length === 1) {
+                const grupoImportado = AppState.grupos.find(g => g.nome === gruposImportados[0]);
+                if (grupoImportado) {
+                    AppState.grupoAtivo = grupoImportado;
+                    Storage.salvar();
+                    this.atualizarSeletorGrupo();
+                    this.renderizar();
+                    Utils.notificar(`✅ Grupo "${gruposImportados[0]}" importado e selecionado!`);
+                }
+            } else {
+                Utils.notificar(`✅ ${gruposImportados.length} grupos importados: ${gruposImportados.join(', ')}`);
+            }
+        }
+
+        if (erros > 0) {
+            Utils.notificar(`⚠️ ${erros} arquivo(s) não puderam ser importados.`);
+        }
+    },
+
+    /**
+     * Lê um arquivo como texto
+     */
+    lerArquivo(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(file);
+        });
     }
 };
 
@@ -2924,10 +2930,20 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Botão importar grupos online
+    // Botão e input para importar grupos
     const btnImportarGrupos = document.getElementById('btnImportarGrupos');
+    const inputImportarGrupos = document.getElementById('inputImportarGrupos');
+
     btnImportarGrupos.addEventListener('click', () => {
-        UI.importarGruposOnline();
+        inputImportarGrupos.click();
+    });
+
+    inputImportarGrupos.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            UI.importarGruposDeArquivos(e.target.files);
+            // Limpa o input para permitir selecionar o mesmo arquivo novamente
+            e.target.value = '';
+        }
     });
 });
 </script></body></html>
