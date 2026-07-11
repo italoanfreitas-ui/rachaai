@@ -14,11 +14,16 @@
     <meta name="apple-mobile-web-app-title" content="OZplus">
     <link rel="apple-touch-icon" href="./icon-192.png">
 
+    <!--
+        Tailwind CDN: na 1ª abertura (com internet) o Service Worker
+        armazena este script em cache. A partir daí o app abre offline.
+    -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        /* Fonte do sistema — sem dependência de CDN, funciona 100% offline */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         'Helvetica Neue', Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         ::-webkit-scrollbar { width: 6px; }
@@ -86,6 +91,18 @@
     </header>
 
     <main class="flex-1 max-w-md w-full mx-auto px-4 pt-4 space-y-4">
+
+        <!-- ─── Card: primeira carga (desaparece após cache pronto) ─── -->
+        <div id="offline-info-card" class="bg-gradient-to-r from-indigo-950/40 to-slate-900 border border-indigo-800/30 p-4 rounded-2xl shadow-md flex items-center justify-between gap-3">
+            <div class="flex-1">
+                <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Salvando app para uso offline…
+                </h4>
+                <p class="text-[10px] text-slate-400 mt-1 leading-normal">Mantenha a internet ativa por um momento. Depois o app abrirá sem conexão.</p>
+            </div>
+            <div class="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin shrink-0"></div>
+        </div>
 
         <!-- ─── Card: permissão de notificação pendente ─── -->
         <div id="notification-permission-card" class="hidden bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-cyan-800/30 p-4 rounded-2xl shadow-md flex items-center justify-between gap-3">
@@ -506,7 +523,7 @@
     <!-- ══════════════════════ JAVASCRIPT ══════════════════════ -->
     <script>
         // ────────────────────────────────────────────────────────
-        // SERVICE WORKER: notificações verdadeiras em background
+        // SERVICE WORKER: cache offline + notificações em background
         // ────────────────────────────────────────────────────────
         let swRegistration = null;
 
@@ -514,6 +531,24 @@
             if (!('serviceWorker' in navigator)) return;
             try {
                 swRegistration = await navigator.serviceWorker.register('./sw.js');
+
+                // Quando o SW termina de instalar, o app já está cacheado
+                // Esconde o banner de "primeira carga" se existir
+                swRegistration.addEventListener('updatefound', () => {
+                    const newSW = swRegistration.installing;
+                    newSW.addEventListener('statechange', () => {
+                        if (newSW.state === 'activated') {
+                            const banner = document.getElementById('offline-info-card');
+                            if (banner) banner.classList.add('hidden');
+                        }
+                    });
+                });
+
+                // Se SW já está ativo (app já foi aberto antes = já está cacheado)
+                if (swRegistration.active) {
+                    const banner = document.getElementById('offline-info-card');
+                    if (banner) banner.classList.add('hidden');
+                }
             } catch (e) {
                 console.warn('Service Worker não pôde ser registrado:', e);
             }
@@ -1054,6 +1089,17 @@
             restoreChecklist('ambientes');
             updateProgress('veiculos');
             restoreTimerState();
+
+            // Verifica se o app já estava cacheado (offline-ready)
+            // Se sim, esconde o banner de "salvando para offline"
+            if ('caches' in window) {
+                caches.has('ozplus-v2').then(exists => {
+                    if (exists) {
+                        const banner = document.getElementById('offline-info-card');
+                        if (banner) banner.classList.add('hidden');
+                    }
+                });
+            }
         });
     </script>
 </body>
