@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guia de Operação - WIER OZplus</title>
-    <!-- Tailwind CSS para estilização moderna e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -12,50 +11,64 @@
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        /* Custom scrollbar para visual premium */
-        ::-webkit-scrollbar {
-            width: 6px;
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+        /* Anel de progresso do timer */
+        @keyframes ring-glow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(6,182,212,0.4)); }
+            50%       { filter: drop-shadow(0 0 12px rgba(6,182,212,0.8)); }
         }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
+        .timer-ring-active { animation: ring-glow 2.5s ease-in-out infinite; }
+
+        /* Efeito de check nas etapas */
+        .step-card { position: relative; }
+        .step-card input[type=checkbox]:checked + span {
+            text-decoration: line-through;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased pb-12">
 
-    <!-- HEADER -->
+    <!-- ══════════════════════════════════════ HEADER ══════════════════════════════════════ -->
     <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 shadow-lg">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <!-- ÍCONE DE OZÔNIO (O3) CUSTOMIZADO -->
-                <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 p-2.5 rounded-xl shadow-md shadow-cyan-500/10 text-white flex items-center justify-center">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <!-- Átomo superior -->
-                        <circle cx="12" cy="6" r="3.5" class="stroke-cyan-300" fill="currentColor" fill-opacity="0.1"/>
+
+                <!-- ÍCONE O₃ MELHORADO: molécula de ozônio com geometria bent realista -->
+                <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 p-2.5 rounded-xl shadow-lg shadow-cyan-500/25 flex items-center justify-center">
+                    <svg class="w-7 h-7" viewBox="0 0 28 28" fill="none">
+                        <!-- Átomo superior (central) — maior brilho -->
+                        <circle cx="14" cy="6.5" r="4" stroke="white" stroke-width="1.8" fill="white" fill-opacity="0.22"/>
                         <!-- Átomo inferior esquerdo -->
-                        <circle cx="6.5" cy="15.5" r="3.5" class="stroke-cyan-400" fill="currentColor" fill-opacity="0.1"/>
+                        <circle cx="5.5" cy="20" r="3.5" stroke="rgba(186,230,253,0.95)" stroke-width="1.5" fill="white" fill-opacity="0.08"/>
                         <!-- Átomo inferior direito -->
-                        <circle cx="17.5" cy="15.5" r="3.5" class="stroke-cyan-400" fill="currentColor" fill-opacity="0.1"/>
-                        <!-- Linhas de conexões moleculares -->
-                        <line x1="10.2" y1="8.8" x2="8.3" y2="12.7" class="stroke-slate-400" stroke-dasharray="1 1"/>
-                        <line x1="13.8" y1="8.8" x2="15.7" y2="12.7" class="stroke-slate-400" stroke-dasharray="1 1"/>
+                        <circle cx="22.5" cy="20" r="3.5" stroke="rgba(186,230,253,0.95)" stroke-width="1.5" fill="white" fill-opacity="0.08"/>
+                        <!-- Ligação central-esquerda -->
+                        <line x1="11" y1="9.8" x2="7.8" y2="16.6" stroke="white" stroke-opacity="0.55" stroke-width="1.4" stroke-dasharray="1.8 1.4" stroke-linecap="round"/>
+                        <!-- Ligação central-direita -->
+                        <line x1="17" y1="9.8" x2="20.2" y2="16.6" stroke="white" stroke-opacity="0.55" stroke-width="1.4" stroke-dasharray="1.8 1.4" stroke-linecap="round"/>
+                        <!-- Núcleo de ressonância (ponto central) -->
+                        <circle cx="14" cy="13.5" r="1.4" fill="white" fill-opacity="0.28"/>
+                        <!-- Brilho no átomo superior -->
+                        <circle cx="12.8" cy="5.3" r="1" fill="white" fill-opacity="0.45"/>
                     </svg>
                 </div>
+
                 <div>
-                    <h1 class="text-base font-extrabold tracking-wider text-white uppercase flex items-center gap-1">
-                        WIER <span class="text-cyan-400 font-medium text-xs px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700">OZ PLUS</span>
+                    <h1 class="text-base font-extrabold tracking-wider text-white uppercase flex items-center gap-1.5">
+                        WIER
+                        <span class="text-cyan-400 font-semibold text-[11px] px-1.5 py-0.5 rounded-md bg-slate-800 border border-slate-700 tracking-normal">OZ PLUS</span>
                     </h1>
-                    <p class="text-[10px] text-slate-400">Guia de Operação Inteligente</p>
+                    <p class="text-[10px] text-slate-400 tracking-wide">Guia de Operação Inteligente</p>
                 </div>
             </div>
-            
-            <!-- Quick Voltage Badge -->
+
             <div class="text-right">
                 <span class="inline-flex items-center gap-1 bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-semibold px-2 py-1 rounded-full">
+                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                     Bivolt Manual
                 </span>
             </div>
@@ -64,50 +77,80 @@
 
     <main class="flex-1 max-w-md w-full mx-auto px-4 pt-4 space-y-4">
 
-        <!-- CARD DE PERMISSÃO DE NOTIFICAÇÕES (APARECE SE NÃO AUTORIZADO) -->
-        <div id="notification-permission-card" class="bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-cyan-800/30 p-4 rounded-2xl shadow-md flex items-center justify-between gap-3">
+        <!-- ─── Card: permissão de notificação pendente ─── -->
+        <div id="notification-permission-card" class="hidden bg-gradient-to-r from-cyan-950/40 to-slate-900 border border-cyan-800/30 p-4 rounded-2xl shadow-md flex items-center justify-between gap-3">
             <div class="flex-1">
                 <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
                     Alertas em Segundo Plano
                 </h4>
-                <p class="text-[10px] text-slate-400 mt-1 leading-normal">Permita notificações para receber avisos de término mesmo com a tela bloqueada ou usando outros aplicativos.</p>
+                <p class="text-[10px] text-slate-400 mt-1 leading-normal">Permita notificações para receber avisos de término mesmo com a tela bloqueada ou em outro app.</p>
             </div>
             <button onclick="requestNotificationPermission()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-3 py-2 rounded-lg transition shrink-0 active:scale-95">
                 Ativar Alertas
             </button>
         </div>
 
-        <!-- CARD 1: SELETOR DE MODO (TABS) -->
+        <!-- ─── Card: notificação bloqueada pelo usuário ─── -->
+        <div id="notification-denied-card" class="hidden bg-gradient-to-r from-red-950/40 to-slate-900 border border-red-900/30 p-4 rounded-2xl shadow-md">
+            <h4 class="text-xs font-bold text-red-400 flex items-center gap-1.5 mb-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                Notificações Bloqueadas
+            </h4>
+            <p class="text-[10px] text-slate-400 leading-normal">Acesse <strong class="text-slate-300">Configurações do navegador → Notificações</strong> e permita este site para receber alertas de conclusão.</p>
+        </div>
+
+        <!-- ─── Card: Seletor de Modo (Tabs) ─── -->
         <div class="bg-slate-900 border border-slate-800 p-1.5 rounded-2xl grid grid-cols-3 gap-1 shadow-inner">
+
+            <!-- TAB VEÍCULOS: ícone sedã perfil lateral -->
             <button onclick="switchTab('veiculos')" id="btn-veiculos" class="tab-btn py-3 rounded-xl flex flex-col items-center gap-1 transition-all duration-300 text-cyan-400 bg-slate-800 border border-slate-700/50 shadow-md">
-                <!-- ÍCONE DE CARRO DE PASSEIO REALISTA -->
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 18H5M5 18a2 2 0 11-4 0h4m14 0a2 2 0 11-4 0h4M3 14c0-2 1.5-3.5 3.5-3.5h11c2 0 3.5 1.5 3.5 3.5V18H3v-4z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 10.5l1.5-4.5h9l1.5 4.5" />
-                    <circle cx="7" cy="14" r="0.75" fill="currentColor"/>
-                    <circle cx="17" cy="14" r="0.75" fill="currentColor"/>
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Teto/cabine -->
+                    <path d="M6.5 11.5 L8.2 7 L15.8 7 L17.5 11.5"/>
+                    <!-- Divisória de vidros/porta -->
+                    <line x1="12" y1="7" x2="12" y2="11.5"/>
+                    <!-- Pilar A (dianteiro inclinado) -->
+                    <line x1="8.2" y1="7" x2="6.5" y2="11.5"/>
+                    <!-- Corpo/chassi -->
+                    <path d="M2.5 11.5 L2.5 14 Q2.5 15 4 15 L20 15 Q21.5 15 21.5 14 L21.5 11.5 Z"/>
+                    <!-- Para-choque dianteiro -->
+                    <path d="M21.5 13 L23 13.5"/>
+                    <!-- Para-choque traseiro -->
+                    <path d="M2.5 13 L1 13.5"/>
+                    <!-- Roda dianteira -->
+                    <circle cx="7.2" cy="17" r="2.2"/>
+                    <circle cx="7.2" cy="17" r="0.7" fill="currentColor" stroke="none"/>
+                    <!-- Roda traseira -->
+                    <circle cx="16.8" cy="17" r="2.2"/>
+                    <circle cx="16.8" cy="17" r="0.7" fill="currentColor" stroke="none"/>
+                    <!-- Farole dianteiro (detalhe) -->
+                    <line x1="21" y1="11.8" x2="22.5" y2="11.4" stroke-width="1.2"/>
                 </svg>
                 <span class="text-xs font-bold">Veículos</span>
                 <span class="text-[9px] opacity-75 font-medium">15 min</span>
             </button>
+
+            <!-- TAB AMBIENTES -->
             <button onclick="switchTab('ambientes')" id="btn-ambientes" class="tab-btn py-3 rounded-xl flex flex-col items-center gap-1 transition-all duration-300 text-slate-400 hover:text-slate-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
                 <span class="text-xs font-bold">Ambientes</span>
                 <span class="text-[9px] opacity-75 font-medium">Calculadora</span>
             </button>
+
+            <!-- TAB IMPORTANTE -->
             <button onclick="switchTab('importante')" id="btn-importante" class="tab-btn py-3 rounded-xl flex flex-col items-center gap-1 transition-all duration-300 text-slate-400 hover:text-slate-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
                 <span class="text-xs font-bold">Importante</span>
                 <span class="text-[9px] opacity-75 font-medium">Cuidados</span>
             </button>
         </div>
 
-        <!-- PROGRESS BAR PARA OS CHECKLISTS -->
+        <!-- ─── Progress Bar ─── -->
         <div id="progress-container" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md transition-all duration-300">
             <div class="flex justify-between items-center mb-1.5">
                 <span class="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
@@ -122,20 +165,19 @@
             <div class="flex justify-between items-center mt-2.5">
                 <span class="text-[10px] text-slate-500">Marque as etapas conforme executa</span>
                 <button onclick="resetChecklists()" class="text-[10px] text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 transition">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Limpar Progresso
                 </button>
             </div>
         </div>
 
-        <!-- TAB CONTENT: VEÍCULOS -->
+        <!-- ══════════════════════ TAB: VEÍCULOS ══════════════════════ -->
         <div id="tab-veiculos" class="tab-content space-y-4">
-            <!-- Info Card -->
             <div class="bg-gradient-to-r from-blue-950/40 to-slate-900 border border-blue-900/30 p-4 rounded-2xl shadow-md">
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-500/10 p-2.5 rounded-xl border border-blue-500/20 text-blue-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                     <div>
@@ -146,52 +188,51 @@
                 </div>
             </div>
 
-            <!-- Steps List -->
             <div class="space-y-2.5">
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Retirar do veículo acessórios pessoais (<span class="font-semibold text-slate-100">celular, carteira, relógio</span>) e os <span class="font-semibold text-slate-100">tapetes de borracha</span>.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
-                        Baixar os <span class="font-semibold text-slate-100">protetores de sol</span> e abrir os compartimentos internos (como o <span class="font-semibold text-slate-100">porta-luvas</span>) para espalhar o gás.
+                        Baixar os <span class="font-semibold text-slate-100">protetores de sol</span> e abrir compartimentos internos (como o <span class="font-semibold text-slate-100">porta-luvas</span>) para espalhar o gás.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Fechar <span class="font-semibold text-slate-100">todos</span> os vidros do veículo para evitar vazamento do ozônio.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Ligar o carro, ajustar o ar-condicionado em <span class="font-semibold text-cyan-400">20°C</span> com <span class="font-semibold text-cyan-400">recirculação interna ligada</span> na potência máxima e difusores abertos.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Ligar o gerador na tomada externa e posicioná-lo <span class="font-semibold text-slate-100">no centro do veículo</span>, entre os bancos dianteiros.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Ajustar o tempo de funcionamento no <span class="font-semibold text-slate-100">temporizador analógico</span> do painel do gerador.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Ligar o gerador de ozônio, <span class="font-semibold text-amber-400">sair imediatamente</span> do veículo e fechar todas as portas.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('veiculos')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         <span class="font-semibold text-emerald-400">Pós-aplicação:</span> Deixar a ventilação ligada, abrir todas as portas e aguardar <span class="font-semibold text-emerald-400">pelo menos 10 minutos</span> para a troca de ar completa antes de usar o veículo.
                     </span>
@@ -199,15 +240,15 @@
             </div>
         </div>
 
-        <!-- TAB CONTENT: AMBIENTES (COM CALCULADORA INTELIGENTE) -->
+        <!-- ══════════════════════ TAB: AMBIENTES ══════════════════════ -->
         <div id="tab-ambientes" class="tab-content space-y-4 hidden">
-            
-            <!-- CALCULADORA DE ÁREA -->
+
+            <!-- Calculadora de Área -->
             <div class="bg-gradient-to-r from-teal-950/40 to-slate-900 border border-teal-900/30 p-4 rounded-2xl shadow-md space-y-4">
                 <div class="flex items-center gap-2">
                     <div class="bg-teal-500/10 p-2 rounded-lg text-teal-400">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div>
@@ -216,106 +257,98 @@
                     </div>
                 </div>
 
-                <!-- Input de m² com ajuste fácil por botões -->
                 <div class="flex items-center justify-between gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
                     <div class="flex items-center gap-1.5">
-                        <button onclick="adjustArea(-5)" class="w-10 h-10 flex items-center justify-center bg-slate-850 hover:bg-slate-800 text-white font-bold rounded-lg border border-slate-750 active:scale-95 transition">-5</button>
-                        <button onclick="adjustArea(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-850 hover:bg-slate-800 text-white font-bold rounded-lg border border-slate-750 active:scale-95 transition">-1</button>
+                        <button onclick="adjustArea(-5)" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg border border-slate-700 active:scale-95 transition">-5</button>
+                        <button onclick="adjustArea(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg border border-slate-700 active:scale-95 transition">-1</button>
                     </div>
-                    
                     <div class="text-center flex-1">
                         <div class="flex items-center justify-center gap-1">
                             <input type="number" id="area-input" value="20" min="1" max="150" oninput="calculateEnvironmentTime()" class="w-16 bg-transparent text-center text-2xl font-extrabold text-teal-400 border-b border-teal-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                             <span class="text-base font-bold text-slate-400">m²</span>
                         </div>
                     </div>
-
                     <div class="flex items-center gap-1.5">
-                        <button onclick="adjustArea(1)" class="w-10 h-10 flex items-center justify-center bg-slate-850 hover:bg-slate-800 text-white font-bold rounded-lg border border-slate-750 active:scale-95 transition">+1</button>
-                        <button onclick="adjustArea(5)" class="w-10 h-10 flex items-center justify-center bg-slate-850 hover:bg-slate-800 text-white font-bold rounded-lg border border-slate-750 active:scale-95 transition">+5</button>
+                        <button onclick="adjustArea(1)" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg border border-slate-700 active:scale-95 transition">+1</button>
+                        <button onclick="adjustArea(5)" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg border border-slate-700 active:scale-95 transition">+5</button>
                     </div>
                 </div>
 
-                <!-- Display de Cálculo do Tempo -->
                 <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
                     <div>
                         <span class="text-[10px] text-slate-400 uppercase font-semibold">Tempo Estimado Calculado</span>
                         <div id="calculated-time-text" class="text-xl font-black text-white">30 Minutos</div>
                     </div>
-                    <!-- Sync Button -->
                     <button onclick="syncCalculatedTimeToTimer()" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold rounded-lg transition shadow-md shadow-teal-900/20 active:scale-95 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                         Aplicar ao Timer
                     </button>
                 </div>
 
-                <!-- Dynamic Warning for Large Rooms -->
                 <div id="area-warning" class="hidden bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-lg text-[11px] text-amber-300 leading-normal">
-                    ⚠️ <strong>Aviso de área recomendada:</strong> O limite de especificação do Wier OZplus é de até 40m² por ciclo de 60 minutos. Ambientes maiores podem necessitar de múltiplos ciclos em pontos de posicionamento diferentes para uma higienização eficaz.
+                    ⚠️ <strong>Aviso de área recomendada:</strong> O limite do Wier OZplus é de até 40m² por ciclo de 60 minutos. Ambientes maiores podem necessitar de múltiplos ciclos em pontos diferentes para uma higienização eficaz.
                 </div>
             </div>
 
-            <!-- Steps List -->
             <div class="space-y-2.5">
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Verificar se a chave seletora de tensão <span class="font-semibold text-amber-400">110V/220V</span> (atrás do gerador) está de acordo com a tomada local.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Fechar portas e janelas do ambiente. <span class="font-semibold text-red-400">Garantir a ausência completa de pessoas e animais</span>.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Abrir as <span class="font-semibold text-slate-100">gavetas e portas de armários</span> para permitir que o gás circule e atinja ácaros ou mofo.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Posicionar o gerador de ozônio no centro do cômodo, a uma <span class="font-semibold text-slate-100">altura de aproximadamente 1 metro do chão</span>.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Ajustar o tempo de funcionamento conforme o tamanho calculado do ambiente.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Conectar o equipamento na energia, ligá-lo e <span class="font-semibold text-amber-400">sair imediatamente do local</span>.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
                         Bloquear o acesso de pessoas ou animais durante toda a atividade.
                     </span>
                 </label>
                 <label class="step-card flex items-start gap-3 bg-slate-900 border border-slate-800 p-3.5 rounded-xl cursor-pointer hover:border-slate-700 transition active:scale-[0.99]">
-                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer" onchange="updateProgress()">
+                    <input type="checkbox" class="step-checkbox mt-1 rounded text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-slate-800 border-slate-700 w-5 h-5 transition cursor-pointer shrink-0" onchange="updateProgress('ambientes')">
                     <span class="text-sm text-slate-200 leading-relaxed">
-                        <span class="font-semibold text-emerald-400">Pós-aplicação:</span> Abrir portas e janelas para ventilar bem e <span class="font-semibold text-emerald-400">aguardar cerca de 30 minutos</span> antes de voltar a ocupar o local de forma definitiva.
+                        <span class="font-semibold text-emerald-400">Pós-aplicação:</span> Abrir portas e janelas para ventilar bem e <span class="font-semibold text-emerald-400">aguardar cerca de 30 minutos</span> antes de voltar a ocupar o local.
                     </span>
                 </label>
             </div>
         </div>
 
-        <!-- TAB CONTENT: OBSERVAÇÕES IMPORTANTES -->
+        <!-- ══════════════════════ TAB: IMPORTANTE ══════════════════════ -->
         <div id="tab-importante" class="tab-content space-y-4 hidden">
-            <!-- Warning Header -->
             <div class="bg-gradient-to-r from-amber-950/40 to-slate-900 border border-amber-900/30 p-4 rounded-2xl shadow-md">
                 <div class="flex items-center gap-3">
                     <div class="bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-amber-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                     </div>
                     <div>
@@ -326,7 +359,6 @@
                 </div>
             </div>
 
-            <!-- Notes Cards Grid -->
             <div class="space-y-3">
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex gap-3">
                     <div class="text-cyan-400 shrink-0 font-extrabold text-lg">01</div>
@@ -335,7 +367,6 @@
                         <p class="text-xs text-slate-300 leading-relaxed">Se necessário, você pode repetir ou aumentar o tempo de aplicação do ozônio livremente até atingir a eliminação satisfatória de odores e contaminantes.</p>
                     </div>
                 </div>
-
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex gap-3">
                     <div class="text-cyan-400 shrink-0 font-extrabold text-lg">02</div>
                     <div>
@@ -343,7 +374,6 @@
                         <p class="text-xs text-slate-300 leading-relaxed">Antes de ligar o aparelho, faça uma boa higienização a seco, preferencialmente aspirando resíduos orgânicos pesados ou poeira acumulada.</p>
                     </div>
                 </div>
-
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex gap-3">
                     <div class="text-cyan-400 shrink-0 font-extrabold text-lg">03</div>
                     <div>
@@ -351,7 +381,6 @@
                         <p class="text-xs text-slate-300 leading-relaxed">Atenção! A aplicação do ozônio não exclui a faxina convencional. Ela serve como purificação profunda, descontaminando o ar, estofados e dutos com muito mais eficiência do que uma limpeza normal.</p>
                     </div>
                 </div>
-
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex gap-3 border-l-4 border-l-red-500">
                     <div class="text-red-400 shrink-0 font-extrabold text-lg">⚠️</div>
                     <div>
@@ -362,90 +391,174 @@
             </div>
         </div>
 
-        <!-- APP UTILITY: MOBILE CRONÔMETRO DE OPERAÇÃO -->
+        <!-- ══════════════════════ TIMER ══════════════════════ -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md space-y-3">
             <div class="flex items-center justify-between">
                 <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-cyan-400 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     Tempo de Aplicação Ativo
                 </h3>
                 <span id="timer-status" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium border border-slate-700">Parado</span>
             </div>
-            
-            <!-- Display de Tempo e Indicador -->
-            <div class="text-center bg-slate-950 py-5 rounded-xl border border-slate-800 relative overflow-hidden">
-                <div id="timer-display" class="text-4xl font-extrabold text-white tracking-widest font-mono">15:00</div>
-                <div class="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">Temporizador Inteligente</div>
+
+            <!-- Display com anel de progresso circular -->
+            <div class="flex flex-col items-center bg-slate-950 py-5 rounded-xl border border-slate-800">
+                <div class="relative w-44 h-44 flex items-center justify-center" id="timer-ring-container">
+                    <!-- SVG do anel -->
+                    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 120 120" style="transform: rotate(-90deg)">
+                        <!-- Trilha de fundo -->
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="#1e293b" stroke-width="8"/>
+                        <!-- Anel de progresso -->
+                        <circle id="timer-ring" cx="60" cy="60" r="52" fill="none"
+                                stroke="url(#timerGrad)" stroke-width="8"
+                                stroke-dasharray="326.7" stroke-dashoffset="0"
+                                stroke-linecap="round"
+                                style="transition: stroke-dashoffset 0.9s linear;"/>
+                        <defs>
+                            <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#06b6d4"/>
+                                <stop offset="100%" stop-color="#3b82f6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <!-- Conteúdo central -->
+                    <div class="text-center z-10 select-none">
+                        <div id="timer-display" class="text-3xl font-extrabold text-white tracking-widest font-mono leading-none">15:00</div>
+                        <div class="text-[9px] text-slate-500 uppercase tracking-widest mt-1.5">restantes</div>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-2 uppercase tracking-wider">Temporizador Inteligente</div>
             </div>
 
-            <!-- Botões de Ajuste Manual Fino (Mobile-Friendly) -->
+            <!-- Ajuste fino de minutos -->
             <div class="grid grid-cols-4 gap-1.5">
-                <button onclick="adjustTimerMinutes(-5)" class="py-2.5 bg-slate-850 hover:bg-slate-800 border border-slate-750 font-bold rounded-xl text-xs text-rose-400 transition active:scale-95">-5m</button>
-                <button onclick="adjustTimerMinutes(-1)" class="py-2.5 bg-slate-850 hover:bg-slate-800 border border-slate-750 font-bold rounded-xl text-xs text-rose-300 transition active:scale-95">-1m</button>
-                <button onclick="adjustTimerMinutes(1)" class="py-2.5 bg-slate-850 hover:bg-slate-800 border border-slate-750 font-bold rounded-xl text-xs text-emerald-300 transition active:scale-95">+1m</button>
-                <button onclick="adjustTimerMinutes(5)" class="py-2.5 bg-slate-850 hover:bg-slate-800 border border-slate-750 font-bold rounded-xl text-xs text-emerald-400 transition active:scale-95">+5m</button>
+                <button onclick="adjustTimerMinutes(-5)" class="py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 font-bold rounded-xl text-xs text-rose-400 transition active:scale-95">-5m</button>
+                <button onclick="adjustTimerMinutes(-1)" class="py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 font-bold rounded-xl text-xs text-rose-300 transition active:scale-95">-1m</button>
+                <button onclick="adjustTimerMinutes(1)"  class="py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 font-bold rounded-xl text-xs text-emerald-300 transition active:scale-95">+1m</button>
+                <button onclick="adjustTimerMinutes(5)"  class="py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 font-bold rounded-xl text-xs text-emerald-400 transition active:scale-95">+5m</button>
             </div>
 
-            <!-- Presets de Botão Rápido -->
+            <!-- Presets rápidos -->
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="setTimerPreset(15)" class="py-2 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 transition">15 min (Carro)</button>
-                <button onclick="setTimerPreset(30)" class="py-2 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-teal-400 transition">30 min (Médio)</button>
-                <button onclick="setTimerPreset(60)" class="py-2 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 transition">60 min (Ambiente)</button>
+                <button onclick="setTimerPreset(15)" class="py-2 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 transition active:scale-95">15 min (Carro)</button>
+                <button onclick="setTimerPreset(30)" class="py-2 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-teal-400 transition active:scale-95">30 min (Médio)</button>
+                <button onclick="setTimerPreset(60)" class="py-2 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 transition active:scale-95">60 min (Ambiente)</button>
             </div>
 
-            <!-- Timer Controls -->
+            <!-- Controles principais -->
             <div class="grid grid-cols-2 gap-2 pt-1">
-                <button onclick="toggleTimer()" id="btn-timer-start" class="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-extrabold rounded-xl text-xs transition shadow-md shadow-cyan-600/15">
+                <button onclick="toggleTimer()" id="btn-timer-start" class="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-extrabold rounded-xl text-xs transition shadow-md shadow-cyan-600/20 active:scale-95">
                     Iniciar Cronômetro
                 </button>
-                <button onclick="resetTimer()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold rounded-xl text-xs transition">
-                    Zerar para 15m
+                <button onclick="resetTimer()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold rounded-xl text-xs transition active:scale-95">
+                    Reiniciar Timer
                 </button>
+            </div>
+
+            <!-- ─── Integração com dispositivo nativo ─── -->
+            <div class="border-t border-slate-800 pt-3 space-y-2">
+                <p class="text-[10px] text-slate-500 text-center font-medium uppercase tracking-wide">Garantia de alerta com app fechado</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Botão para abrir o relógio nativo do celular (Android) -->
+                    <button onclick="openNativeTimer()" class="py-2.5 flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-cyan-700/50 rounded-xl text-xs font-semibold text-slate-200 transition active:scale-95">
+                        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Relógio do Celular
+                    </button>
+                    <!-- Botão para exportar alarme como .ics (iOS + desktop) -->
+                    <button onclick="exportToCalendar()" class="py-2.5 flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-teal-700/50 rounded-xl text-xs font-semibold text-slate-200 transition active:scale-95">
+                        <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Alarme no Calendário
+                    </button>
+                </div>
+                <p class="text-[9px] text-slate-600 text-center leading-tight">
+                    "Relógio do Celular" abre o timer nativo no Android.<br>
+                    "Alarme no Calendário" gera um evento .ics para iOS ou desktop.
+                </p>
             </div>
         </div>
 
     </main>
 
-    <!-- FLOATING ACTION NOTIFICATION TOAST -->
-    <div id="notification-modal" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-slate-800 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 opacity-0 pointer-events-none transition-all duration-300 max-w-xs w-full">
-        <div class="p-1 rounded-lg bg-cyan-500/10 text-cyan-400" id="notification-icon">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <!-- ─── Toast de notificação flutuante ─── -->
+    <div id="notification-modal" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-slate-700 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 opacity-0 pointer-events-none transition-all duration-300 max-w-xs w-full">
+        <div class="p-1 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0" id="notification-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <p id="notification-message" class="text-xs font-semibold">Configuração salva!</p>
+        <p id="notification-message" class="text-xs font-semibold leading-snug">Configuração salva!</p>
     </div>
 
-    <!-- JAVASCRIPT CONTROLLER -->
+    <!-- ══════════════════════ JAVASCRIPT ══════════════════════ -->
     <script>
-        // Notification permission request controller
+        // ────────────────────────────────────────────────────────
+        // SERVICE WORKER: notificações verdadeiras em background
+        // ────────────────────────────────────────────────────────
+        let swRegistration = null;
+
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            try {
+                swRegistration = await navigator.serviceWorker.register('./sw.js');
+            } catch (e) {
+                console.warn('Service Worker não pôde ser registrado:', e);
+            }
+        }
+
+        function scheduleSwNotification(endTime) {
+            if (!swRegistration || !swRegistration.active) return;
+            swRegistration.active.postMessage({ type: 'SCHEDULE_NOTIFICATION', endTime });
+        }
+
+        function cancelSwNotification() {
+            if (!swRegistration || !swRegistration.active) return;
+            swRegistration.active.postMessage({ type: 'CANCEL_NOTIFICATION' });
+        }
+
+        // ────────────────────────────────────────────────────────
+        // PERMISSÃO DE NOTIFICAÇÃO
+        // ────────────────────────────────────────────────────────
         function checkNotificationPermission() {
-            const card = document.getElementById('notification-permission-card');
-            if (!("Notification" in window)) {
-                // Browser doesn't support desktop notifications
-                card.classList.add('hidden');
+            const pendCard   = document.getElementById('notification-permission-card');
+            const deniedCard = document.getElementById('notification-denied-card');
+
+            if (!('Notification' in window)) {
+                pendCard.classList.add('hidden');
+                deniedCard.classList.add('hidden');
                 return;
             }
 
-            if (Notification.permission === 'granted' || Notification.permission === 'denied') {
-                card.classList.add('hidden');
+            if (Notification.permission === 'granted') {
+                pendCard.classList.add('hidden');
+                deniedCard.classList.add('hidden');
+            } else if (Notification.permission === 'denied') {
+                pendCard.classList.add('hidden');
+                deniedCard.classList.remove('hidden');
             } else {
-                card.classList.remove('hidden');
+                pendCard.classList.remove('hidden');
+                deniedCard.classList.add('hidden');
             }
         }
 
         function requestNotificationPermission() {
-            if (!("Notification" in window)) return;
-            
+            if (!('Notification' in window)) return;
             Notification.requestPermission().then(permission => {
                 checkNotificationPermission();
                 if (permission === 'granted') {
-                    showNotification("Perfeito! Alertas em segundo plano estão ativados.", "success");
+                    showNotification('Alertas ativados! Você será avisado ao término.', 'success');
                 }
             });
         }
 
-        // Tab switching logic
+        // ────────────────────────────────────────────────────────
+        // TROCA DE ABAS
+        // ────────────────────────────────────────────────────────
+        let currentTab = 'veiculos';
+
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -454,7 +567,7 @@
             });
 
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            
+
             const activeBtn = document.getElementById(`btn-${tabName}`);
             activeBtn.classList.add('text-cyan-400', 'bg-slate-800', 'border', 'border-slate-700/50', 'shadow-md');
             activeBtn.classList.remove('text-slate-400');
@@ -466,261 +579,351 @@
                 progressContainer.classList.remove('opacity-40', 'pointer-events-none');
             }
 
-            updateProgress();
+            currentTab = tabName;
+            updateProgress(tabName);
         }
 
-        // Progress bar calculation based on visible checkboxes
-        function updateProgress() {
-            const activeTab = document.querySelector('.tab-content:not(.hidden)');
-            if (!activeTab || activeTab.id === 'tab-importante') return;
+        // ────────────────────────────────────────────────────────
+        // PROGRESSO DE ETAPAS + PERSISTÊNCIA
+        // ────────────────────────────────────────────────────────
+        function updateProgress(tabName) {
+            tabName = tabName || currentTab;
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            if (!activeTab || tabName === 'importante') return;
 
             const checkboxes = activeTab.querySelectorAll('.step-checkbox');
-            const total = checkboxes.length;
             let checked = 0;
 
             checkboxes.forEach(cb => {
                 const label = cb.closest('.step-card');
                 if (cb.checked) {
                     checked++;
-                    label.classList.add('bg-slate-900/40', 'border-cyan-900/30', 'text-slate-400');
-                    label.querySelector('span').classList.add('line-through', 'opacity-65');
+                    label.classList.add('opacity-60', 'border-cyan-900/20');
                 } else {
-                    label.classList.remove('bg-slate-900/40', 'border-cyan-900/30', 'text-slate-400');
-                    label.querySelector('span').classList.remove('line-through', 'opacity-65');
+                    label.classList.remove('opacity-60', 'border-cyan-900/20');
                 }
             });
 
-            const percent = total > 0 ? Math.round((checked / total) * 100) : 0;
-            const bar = document.getElementById('progress-bar');
-            const text = document.getElementById('progress-text');
+            const percent = checkboxes.length > 0 ? Math.round((checked / checkboxes.length) * 100) : 0;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText  = `${percent}% concluído`;
 
-            bar.style.width = `${percent}%`;
-            text.innerText = `${percent}% concluído`;
+            // Persiste estado dos checkboxes
+            saveChecklist(tabName);
 
             if (percent === 100) {
-                showNotification("Etapas concluídas! Programe o tempo de segurança pós-aplicação.", "success");
+                showNotification('Todas as etapas concluídas! Agora inicie o timer.', 'success');
             }
         }
 
-        function resetChecklists() {
-            document.querySelectorAll('.step-checkbox').forEach(cb => {
-                cb.checked = false;
-            });
-            updateProgress();
-            showNotification("Progresso de etapas reiniciado.", "info");
+        function saveChecklist(tabName) {
+            const tab = document.getElementById(`tab-${tabName}`);
+            if (!tab) return;
+            const state = Array.from(tab.querySelectorAll('.step-checkbox')).map(cb => cb.checked);
+            try { localStorage.setItem(`ozplus_checklist_${tabName}`, JSON.stringify(state)); } catch(e) {}
         }
 
-        // ENVIRONMENT AREA CALCULATOR
-        let estimatedMinutes = 30; // base logic state
+        function restoreChecklist(tabName) {
+            try {
+                const saved = localStorage.getItem(`ozplus_checklist_${tabName}`);
+                if (!saved) return;
+                const state = JSON.parse(saved);
+                const tab = document.getElementById(`tab-${tabName}`);
+                if (!tab) return;
+                tab.querySelectorAll('.step-checkbox').forEach((cb, i) => {
+                    if (state[i] !== undefined) cb.checked = state[i];
+                });
+            } catch(e) {}
+            updateProgress(tabName);
+        }
+
+        function resetChecklists() {
+            document.querySelectorAll('.step-checkbox').forEach(cb => { cb.checked = false; });
+            try {
+                localStorage.removeItem('ozplus_checklist_veiculos');
+                localStorage.removeItem('ozplus_checklist_ambientes');
+            } catch(e) {}
+            updateProgress(currentTab);
+            showNotification('Progresso reiniciado.', 'info');
+        }
+
+        // ────────────────────────────────────────────────────────
+        // CALCULADORA DE ÁREA
+        // ────────────────────────────────────────────────────────
+        let estimatedMinutes = 30;
 
         function adjustArea(amount) {
-            const input = document.getElementById('area-input');
-            let current = parseInt(input.value) || 0;
-            current += amount;
-            if (current < 1) current = 1;
+            const input   = document.getElementById('area-input');
+            let current   = parseInt(input.value) || 0;
+            current      += amount;
+            if (current < 1)   current = 1;
             if (current > 150) current = 150;
-            input.value = current;
+            input.value   = current;
             calculateEnvironmentTime();
         }
 
         function calculateEnvironmentTime() {
-            const area = parseInt(document.getElementById('area-input').value) || 0;
-            const warningEl = document.getElementById('area-warning');
-            
-            // Formula baseada em: 40m² = 60 minutos (ou seja, 1.5 min por m²)
-            // Com um mínimo funcional estipulado em 15 minutos para espaços pequenos.
-            let computedTime = Math.round(area * 1.5);
-            if (computedTime < 15) {
-                computedTime = 15;
-            }
+            const area       = parseInt(document.getElementById('area-input').value) || 0;
+            const warningEl  = document.getElementById('area-warning');
+            let computed     = Math.max(15, Math.round(area * 1.5));
 
-            estimatedMinutes = computedTime;
-            document.getElementById('calculated-time-text').innerText = `${computedTime} Minutos`;
-
-            // Exibir aviso se a área ultrapassar o limite recomendado de 40m² da Wier OZplus
-            if (area > 40) {
-                warningEl.classList.remove('hidden');
-            } else {
-                warningEl.classList.add('hidden');
-            }
+            estimatedMinutes = computed;
+            document.getElementById('calculated-time-text').innerText = `${computed} Minutos`;
+            warningEl.classList.toggle('hidden', area <= 40);
         }
 
         function syncCalculatedTimeToTimer() {
             setTimerPreset(estimatedMinutes);
-            showNotification(`Tempo de ${estimatedMinutes} min enviado para o timer!`, "success");
+            showNotification(`Tempo de ${estimatedMinutes} min aplicado ao timer!`, 'success');
         }
 
+        // ────────────────────────────────────────────────────────
+        // TIMER — estado
+        // ────────────────────────────────────────────────────────
+        const RING_CIRCUMFERENCE = 326.7; // 2π × 52
 
-        // TIMER STATE MANAGEMENT (With background suspension defense)
-        let timerInterval = null;
-        let timerSeconds = 15 * 60; // default 15 min
-        let timerEndTime = 0; // Absolute target timestamp
-        let timerRunning = false;
+        let timerInterval    = null;
+        let timerSeconds     = 15 * 60;
+        let timerTotalSeconds = 15 * 60; // usado para calcular % do anel
+        let timerEndTime     = 0;
+        let timerRunning     = false;
 
         function updateTimerDisplay() {
-            const minutes = Math.floor(timerSeconds / 60);
-            const seconds = timerSeconds % 60;
-            document.getElementById('timer-display').innerText = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
+            const m = Math.floor(timerSeconds / 60);
+            const s = timerSeconds % 60;
+            document.getElementById('timer-display').innerText =
+                `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-        // Preset Quick Select
-        function setTimerPreset(minutes) {
-            if (timerRunning) toggleTimer(); // Stop timer if running
-            timerSeconds = minutes * 60;
-            updateTimerDisplay();
-            showNotification(`Timer definido para ${minutes} minutos.`, "info");
-        }
-
-        // Fine Adjustment (+ / - minutes)
-        function adjustTimerMinutes(minutes) {
-            let currentMinutes = Math.floor(timerSeconds / 60);
-            currentMinutes += minutes;
-            if (currentMinutes < 1) currentMinutes = 1;
-            if (currentMinutes > 180) currentMinutes = 180; // Limit range to 3 hours
-            
-            timerSeconds = currentMinutes * 60;
-            
-            // Se o timer já estiver rodando, reajusta dinamicamente o tempo final absoluto
-            if (timerRunning) {
-                timerEndTime = Date.now() + (timerSeconds * 1000);
+            // Atualiza anel SVG
+            const ring = document.getElementById('timer-ring');
+            if (ring && timerTotalSeconds > 0) {
+                const fraction = timerSeconds / timerTotalSeconds;          // 1 = cheio, 0 = vazio
+                ring.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - fraction);
             }
-            
-            updateTimerDisplay();
-            showNotification(`Tempo ajustado para ${currentMinutes} min.`, "info");
         }
 
-        // Synthesizer beep (Web Audio API) so we don't depend on external audio files
+        function setTimerPreset(minutes) {
+            if (timerRunning) toggleTimer();
+            timerSeconds      = minutes * 60;
+            timerTotalSeconds = timerSeconds;
+            updateTimerDisplay();
+        }
+
+        function adjustTimerMinutes(delta) {
+            let current = Math.floor(timerSeconds / 60) + delta;
+            if (current < 1)   current = 1;
+            if (current > 180) current = 180;
+
+            timerSeconds = current * 60;
+            if (!timerRunning) timerTotalSeconds = timerSeconds;
+            if (timerRunning) timerEndTime = Date.now() + timerSeconds * 1000;
+
+            updateTimerDisplay();
+            showNotification(`Tempo ajustado para ${current} min.`, 'info');
+        }
+
+        // ────────────────────────────────────────────────────────
+        // TIMER — áudio e vibração
+        // ────────────────────────────────────────────────────────
         function playAlarmSound() {
             try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Função para emitir um tom agudo agradável
-                const playBeep = (timeDelay, freq) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [[0, 880], [0.4, 880], [0.8, 1200]].forEach(([delay, freq]) => {
+                    const osc  = ctx.createOscillator();
+                    const gain = ctx.createGain();
                     osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    
+                    gain.connect(ctx.destination);
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + timeDelay);
-                    
-                    gain.gain.setValueAtTime(0.4, audioCtx.currentTime + timeDelay);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + timeDelay + 0.3);
-                    
-                    osc.start(audioCtx.currentTime + timeDelay);
-                    osc.stop(audioCtx.currentTime + timeDelay + 0.35);
-                };
-
-                // Três beeps consecutivos de atenção
-                playBeep(0, 880);
-                playBeep(0.4, 880);
-                playBeep(0.8, 1200);
-            } catch(e) {
-                console.warn("Áudio não pôde ser reproduzido pela ausência de interação prévia ou suporte do navegador:", e);
-            }
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + delay + 0.3);
+                    osc.start(ctx.currentTime + delay);
+                    osc.stop(ctx.currentTime + delay + 0.35);
+                });
+            } catch (e) {}
         }
 
         function triggerCompletionNotification() {
-            // 1. Envia notificação nativa do sistema (funciona mesmo minimizado/bloqueado)
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification("WIER OZplus - Aplicação Concluída!", {
-                    body: "O tempo programado terminou. Ventile o veículo ou ambiente antes de entrar!",
+            // 1. Notificação nativa do sistema (funciona com SW em segundo plano)
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('WIER OZplus — Aplicação Concluída! ✅', {
+                    body: 'O tempo programado terminou. Ventile o ambiente antes de entrar!',
                     requireInteraction: true
                 });
             }
-
-            // 2. Toca som sintetizado local
+            // 2. Som sintetizado
             playAlarmSound();
-
-            // 3. Executa padrão de vibração no telefone
-            if ('vibrate' in navigator) {
-                navigator.vibrate([200, 100, 200, 100, 400]);
-            }
+            // 3. Vibração
+            if ('vibrate' in navigator) navigator.vibrate([200, 100, 200, 100, 400]);
         }
 
+        // ────────────────────────────────────────────────────────
+        // TIMER — controles
+        // ────────────────────────────────────────────────────────
         function toggleTimer() {
-            const btn = document.getElementById('btn-timer-start');
+            const btn    = document.getElementById('btn-timer-start');
             const status = document.getElementById('timer-status');
+            const ring   = document.getElementById('timer-ring-container');
 
             if (timerRunning) {
-                // Pausar
+                // PAUSAR
                 clearInterval(timerInterval);
                 timerRunning = false;
-                btn.innerText = "Retomar";
-                btn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
-                btn.classList.add('bg-cyan-600', 'hover:bg-cyan-500');
-                status.innerText = "Pausado";
-                status.className = "text-[10px] px-2 py-0.5 rounded-full bg-amber-950/40 text-amber-400 font-semibold border border-amber-800/30";
+                cancelSwNotification();
+
+                btn.innerText = 'Retomar';
+                btn.classList.replace('bg-rose-600', 'bg-cyan-600');
+                btn.classList.replace('hover:bg-rose-500', 'hover:bg-cyan-500');
+                status.innerText  = 'Pausado';
+                status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-950/40 text-amber-400 font-semibold border border-amber-800/30';
+                ring.classList.remove('timer-ring-active');
+
+                clearTimerState();
             } else {
-                // Iniciar
+                // INICIAR / RETOMAR
                 if (timerSeconds <= 0) {
-                    showNotification("Ajuste o tempo antes de começar.", "info");
+                    showNotification('Ajuste o tempo antes de iniciar.', 'info');
                     return;
                 }
-                
-                // Tenta engajar permissão silenciosamente para garantir disparo
-                if ("Notification" in window && Notification.permission === "default") {
-                    Notification.requestPermission();
+
+                // Solicita permissão silenciosamente se ainda pendente
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission().then(checkNotificationPermission);
                 }
 
-                timerRunning = true;
-                btn.innerText = "Pausar";
-                btn.classList.remove('bg-cyan-600', 'hover:bg-cyan-500');
-                btn.classList.add('bg-rose-600', 'hover:bg-rose-500');
-                status.innerText = "Em Execução";
-                status.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-400 font-semibold border border-emerald-800/30";
+                timerRunning     = true;
+                timerEndTime     = Date.now() + timerSeconds * 1000;
 
-                // DEFINE O FIM DO TIMER EM TEMPO ABSOLUTO
-                timerEndTime = Date.now() + (timerSeconds * 1000);
+                btn.innerText = 'Pausar';
+                btn.classList.replace('bg-cyan-600', 'bg-rose-600');
+                btn.classList.replace('hover:bg-cyan-500', 'hover:bg-rose-500');
+                status.innerText  = 'Em Execução';
+                status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-400 font-semibold border border-emerald-800/30';
+                ring.classList.add('timer-ring-active');
 
-                timerInterval = setInterval(() => {
-                    const remaining = Math.round((timerEndTime - Date.now()) / 1000);
-                    
-                    if (remaining <= 0) {
-                        timerSeconds = 0;
-                        updateTimerDisplay();
-                        
-                        clearInterval(timerInterval);
-                        timerRunning = false;
-                        
-                        btn.innerText = "Iniciar Cronômetro";
-                        btn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
-                        btn.classList.add('bg-cyan-600', 'hover:bg-cyan-500');
-                        status.innerText = "Concluído";
-                        status.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold";
-                        
-                        triggerCompletionNotification();
-                        showNotification("Aplicação Finalizada! Aguarde a troca de ar.", "success");
-                    } else {
-                        timerSeconds = remaining;
-                        updateTimerDisplay();
-                    }
-                }, 1000);
+                // Agenda notificação via Service Worker (funciona com navegador minimizado no Android)
+                scheduleSwNotification(timerEndTime);
+
+                // Persiste estado para recuperação após reload
+                saveTimerState();
+
+                timerInterval = setInterval(timerTick, 1000);
             }
         }
 
-        // OUVE MUDANÇA DE VISIBILIDADE DO NAVEGADOR (CORREÇÃO DE SUSPENSÃO MOBILE)
+        function timerTick() {
+            const remaining = Math.round((timerEndTime - Date.now()) / 1000);
+
+            if (remaining <= 0) {
+                timerSeconds = 0;
+                updateTimerDisplay();
+                finishTimer();
+            } else {
+                timerSeconds = remaining;
+                updateTimerDisplay();
+                saveTimerState();
+            }
+        }
+
+        function finishTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            clearTimerState();
+
+            const btn    = document.getElementById('btn-timer-start');
+            const status = document.getElementById('timer-status');
+            const ring   = document.getElementById('timer-ring-container');
+
+            btn.innerText = 'Iniciar Cronômetro';
+            btn.classList.replace('bg-rose-600', 'bg-cyan-600');
+            btn.classList.replace('hover:bg-rose-500', 'hover:bg-cyan-500');
+            status.innerText  = 'Concluído ✓';
+            status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold';
+            ring.classList.remove('timer-ring-active');
+
+            triggerCompletionNotification();
+            showNotification('Aplicação Finalizada! Aguarde a troca de ar completa.', 'success');
+        }
+
+        function resetTimer() {
+            if (timerRunning) toggleTimer();
+            timerSeconds      = 15 * 60;
+            timerTotalSeconds = 15 * 60;
+            updateTimerDisplay();
+
+            const status = document.getElementById('timer-status');
+            status.innerText  = 'Parado';
+            status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium border border-slate-700';
+
+            clearTimerState();
+            showNotification('Temporizador reiniciado para 15 minutos.', 'info');
+        }
+
+        // ────────────────────────────────────────────────────────
+        // TIMER — persistência no localStorage
+        // ────────────────────────────────────────────────────────
+        function saveTimerState() {
+            try {
+                localStorage.setItem('ozplus_timer_end',   timerEndTime);
+                localStorage.setItem('ozplus_timer_total', timerTotalSeconds);
+            } catch(e) {}
+        }
+
+        function clearTimerState() {
+            try {
+                localStorage.removeItem('ozplus_timer_end');
+                localStorage.removeItem('ozplus_timer_total');
+            } catch(e) {}
+        }
+
+        function restoreTimerState() {
+            try {
+                const savedEnd   = localStorage.getItem('ozplus_timer_end');
+                const savedTotal = localStorage.getItem('ozplus_timer_total');
+                if (!savedEnd || !savedTotal) return;
+
+                const remaining = Math.round((parseInt(savedEnd) - Date.now()) / 1000);
+
+                if (remaining > 0) {
+                    timerTotalSeconds = parseInt(savedTotal);
+                    timerSeconds      = remaining;
+                    timerEndTime      = parseInt(savedEnd);
+                    updateTimerDisplay();
+
+                    // Reinicia o intervalo automaticamente
+                    timerRunning = true;
+                    const btn    = document.getElementById('btn-timer-start');
+                    const status = document.getElementById('timer-status');
+                    const ring   = document.getElementById('timer-ring-container');
+
+                    btn.innerText = 'Pausar';
+                    btn.classList.replace('bg-cyan-600', 'bg-rose-600');
+                    btn.classList.replace('hover:bg-cyan-500', 'hover:bg-rose-500');
+                    status.innerText  = 'Em Execução';
+                    status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-400 font-semibold border border-emerald-800/30';
+                    ring.classList.add('timer-ring-active');
+
+                    timerInterval = setInterval(timerTick, 1000);
+                    showNotification(`Timer retomado — ${Math.ceil(remaining/60)} min restantes.`, 'info');
+                } else {
+                    // Timer terminou enquanto a página estava fechada
+                    clearTimerState();
+                    triggerCompletionNotification();
+                    showNotification('O timer finalizou enquanto a página estava fechada!', 'success');
+                }
+            } catch(e) {}
+        }
+
+        // ────────────────────────────────────────────────────────
+        // CORREÇÃO DE SUSPENSÃO MOBILE (visibilitychange)
+        // ────────────────────────────────────────────────────────
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && timerRunning) {
-                // Se o navegador voltar a ficar ativo, recalcula imediatamente contra congelamento de threads
                 const remaining = Math.round((timerEndTime - Date.now()) / 1000);
                 if (remaining <= 0) {
                     timerSeconds = 0;
                     updateTimerDisplay();
-                    
-                    clearInterval(timerInterval);
-                    timerRunning = false;
-                    
-                    const btn = document.getElementById('btn-timer-start');
-                    const status = document.getElementById('timer-status');
-                    btn.innerText = "Iniciar Cronômetro";
-                    btn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
-                    btn.classList.add('bg-cyan-600', 'hover:bg-cyan-500');
-                    status.innerText = "Concluído";
-                    status.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold";
-                    
-                    triggerCompletionNotification();
+                    finishTimer();
                 } else {
                     timerSeconds = remaining;
                     updateTimerDisplay();
@@ -728,44 +931,120 @@
             }
         });
 
-        function resetTimer() {
-            if (timerRunning) toggleTimer();
-            timerSeconds = 15 * 60;
-            updateTimerDisplay();
-            showNotification("Temporizador reiniciado para 15 minutos.", "info");
+        // ────────────────────────────────────────────────────────
+        // INTEGRAÇÃO NATIVA: Relógio do Celular (Android) / Calendário (iOS)
+        // ────────────────────────────────────────────────────────
+
+        // Abre o timer nativo do Android via deep link (Google Clock / Relógio padrão)
+        function openNativeTimer() {
+            const seconds  = Math.max(60, timerSeconds > 0 ? timerSeconds : timerTotalSeconds);
+            const minutes  = Math.round(seconds / 60);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+
+            if (isAndroid) {
+                // Intent deep link para o app Relógio do Android
+                const intentUrl =
+                    `intent://timer#Intent;` +
+                    `action=android.intent.action.SET_TIMER;` +
+                    `S.android.intent.extra.alarm.LENGTH=${seconds};` +
+                    `S.android.intent.extra.alarm.SKIP_UI=false;` +
+                    `S.android.intent.extra.alarm.MESSAGE=WIER%20OZplus%20%E2%80%94%20${minutes}%20min;` +
+                    `end`;
+                window.location.href = intentUrl;
+                showNotification(`Abrindo Relógio com ${minutes} min...`, 'info');
+            } else {
+                // iOS/desktop: fallback para calendário
+                showNotification('Para iOS: use "Alarme no Calendário" ou o app Relógio manualmente.', 'info');
+                exportToCalendar();
+            }
         }
 
-        // Floating Toast Notification
-        function showNotification(message, type = "info") {
+        // Exporta evento .ics com alarme para o calendário nativo (iOS + desktop)
+        function exportToCalendar() {
+            const seconds  = Math.max(60, timerSeconds > 0 ? timerSeconds : timerTotalSeconds);
+            const minutes  = Math.round(seconds / 60);
+            const start    = new Date(Date.now() + seconds * 1000);
+            const end      = new Date(start.getTime() + 60000);
+
+            const pad   = n => String(n).padStart(2, '0');
+            const fmt   = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+
+            const ics = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//WIER OZplus//Timer//PT',
+                'BEGIN:VEVENT',
+                `UID:ozplus-${Date.now()}@wierozplus.local`,
+                `DTSTART:${fmt(start)}`,
+                `DTEND:${fmt(end)}`,
+                `SUMMARY:WIER OZplus — Aplicação Concluída (${minutes} min)`,
+                'DESCRIPTION:O tempo de aplicação de ozônio terminou. Ventile o ambiente por pelo menos 10 minutos antes de entrar.',
+                'BEGIN:VALARM',
+                'TRIGGER:-PT0M',
+                'ACTION:DISPLAY',
+                'DESCRIPTION:WIER OZplus — Ventile o ambiente antes de entrar!',
+                'END:VALARM',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+
+            const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = 'ozplus-alarme.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification(`Arquivo de alarme criado para ${minutes} min — importe ao Calendário!`, 'success');
+        }
+
+        // ────────────────────────────────────────────────────────
+        // TOAST (Notificação flutuante)
+        // ────────────────────────────────────────────────────────
+        let toastTimeout = null;
+
+        function showNotification(message, type = 'info') {
             const modal = document.getElementById('notification-modal');
-            const text = document.getElementById('notification-message');
-            const icon = document.getElementById('notification-icon');
+            const text  = document.getElementById('notification-message');
+            const icon  = document.getElementById('notification-icon');
 
             text.innerText = message;
-            
-            if (type === "success") {
-                icon.className = "p-1 rounded-lg bg-emerald-500/10 text-emerald-400";
-                icon.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-            } else {
-                icon.className = "p-1 rounded-lg bg-cyan-500/10 text-cyan-400";
-                icon.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-            }
+
+            const configs = {
+                success: { bg: 'bg-emerald-500/10', color: 'text-emerald-400', svg: `<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>` },
+                error:   { bg: 'bg-red-500/10',     color: 'text-red-400',     svg: `<path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>` },
+                info:    { bg: 'bg-cyan-500/10',     color: 'text-cyan-400',    svg: `<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>` }
+            };
+            const cfg = configs[type] || configs.info;
+
+            icon.className = `p-1 rounded-lg ${cfg.bg} ${cfg.color} shrink-0`;
+            icon.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">${cfg.svg}</svg>`;
 
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
 
-            setTimeout(() => {
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
                 modal.classList.remove('opacity-100');
                 modal.classList.add('opacity-0', 'pointer-events-none');
-            }, 3000);
+            }, 3200);
         }
 
-        // App boot setup
-        window.onload = () => {
+        // ────────────────────────────────────────────────────────
+        // INICIALIZAÇÃO
+        // ────────────────────────────────────────────────────────
+        window.addEventListener('load', () => {
+            registerServiceWorker();
             calculateEnvironmentTime();
-            updateProgress();
             checkNotificationPermission();
-        };
+            restoreChecklist('veiculos');
+            restoreChecklist('ambientes');
+            updateProgress('veiculos');
+            restoreTimerState();
+        });
     </script>
 </body>
 </html>
