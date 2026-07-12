@@ -1,11 +1,10 @@
-// WIER OZplus — Service Worker
-// Responsabilidades:
-//   1. Cache offline (cache-first): app funciona sem internet após 1ª carga
-//   2. Notificações em background quando o timer encerra
+// WIER OZplus — Service Worker v3
+// 1. Cache offline (cache-first)
+// 2. Notificação IMEDIATA ao iniciar o timer (persistente na barra)
+// 3. Notificação de conclusão quando o setTimeout disparar
 
-const CACHE_NAME = 'ozplus-v2';
+const CACHE_NAME = 'ozplus-v3';
 
-// Arquivos locais pré-cacheados na instalação
 const LOCAL_FILES = [
     './ozplus.html',
     './manifest.json',
@@ -13,108 +12,119 @@ const LOCAL_FILES = [
     './icon-512.png'
 ];
 
-// ── Instalação: pré-cache dos arquivos locais ──────────────────────────────
+// ── Instalação ─────────────────────────────────────────────────────────────
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache =>
-            // allSettled: não falha se ícones ainda não existirem
-            Promise.allSettled(LOCAL_FILES.map(url => cache.add(url).catch(() => {})))
-        ).then(() => self.skipWaiting())
+        caches.open(CACHE_NAME)
+            .then(cache => Promise.allSettled(LOCAL_FILES.map(u => cache.add(u).catch(() => {}))))
+            .then(() => self.skipWaiting())
     );
 });
 
-// ── Ativação: limpa caches antigas ────────────────────────────────────────
+// ── Ativação ───────────────────────────────────────────────────────────────
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys()
-            .then(keys => Promise.all(
-                keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-            ))
+            .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
             .then(() => self.clients.claim())
     );
 });
 
-// ── Fetch: cache-first (CDN e tudo mais cacheado na 1ª vez) ───────────────
+// ── Cache offline ──────────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
-
     event.respondWith(
         caches.match(event.request).then(cached => {
-            // Servido do cache → funciona offline
             if (cached) return cached;
-
-            // Não está no cache → busca na rede e armazena para próxima vez
-            return fetch(event.request)
-                .then(response => {
-                    // Não cacheia respostas inválidas ou opacas (ex: imagens cross-origin sem CORS)
-                    if (!response || response.status !== 200 || response.type === 'opaque') {
-                        return response;
-                    }
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-                    return response;
-                })
-                .catch(() => {
-                    // Sem rede e sem cache: retorna o HTML principal (evita tela em branco)
-                    if (event.request.destination === 'document') {
-                        return caches.match('./ozplus.html');
-                    }
-                });
+            return fetch(event.request).then(response => {
+                if (!response || response.status !== 200 || response.type === 'opaque') return response;
+                const clone = response.clone();
+                caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+                return response;
+            }).catch(() => {
+                if (event.request.destination === 'document') return caches.match('./ozplus.html');
+            });
         })
     );
 });
 
-// ── Timer de notificação em background ────────────────────────────────────
-let pendingTimerId = null;
+// ── Timer ──────────────────────────────────────────────────────────────────
+let completionTimerId = null;
 
 self.addEventListener('message', event => {
-    const { type, endTime } = event.data || {};
+    const { type, endTime, totalSeconds } = event.data || {};
 
-    if (type === 'SCHEDULE_NOTIFICATION') {
-        if (pendingTimerId !== null) {
-            clearTimeout(pendingTimerId);
-            pendingTimerId = null;
-        }
+    if (type === 'TIMER_STARTED') {
+        // 1. Cancela qualquer timer anterior
+        if (completionTimerId !== null) { clearTimeout(completionTimerId); completionTimerId = null; }
 
+        // 2. Mostra notificação PERSISTENTE imediatamente na barra de notificações
+        //    (Esta aparece agora, garante que o usuário veja mesmo sem setTimeout)
+        const endDate   = new Date(endTime);
+        const hh        = String(endDate.getHours()).padStart(2, '0');
+        const mm        = String(endDate.getMinutes()).padStart(2, '0');
+        const totalMins = Math.round(totalSeconds / 60);
+
+        self.registration.showNotification('⏱ WIER OZplus — Timer em andamento', {
+            body: `Ozônio ativo por ${totalMins} min. Término previsto: ${hh}h${mm}`,
+            tag: 'ozplus-timer-active',
+            requireInteraction: false,
+            silent: true,
+            renotify: false
+        });
+
+        // 3. Agenda notificação de conclusão via setTimeout
         const delay = endTime - Date.now();
-
-        if (delay <= 0) {
+        if (delay > 0) {
+            completionTimerId = setTimeout(() => {
+                completionTimerId = null;
+                fireCompletionNotification();
+            }, delay);
+        } else {
             fireCompletionNotification();
-            return;
         }
 
-        pendingTimerId = setTimeout(() => {
-            pendingTimerId = null;
+    } else if (type === 'TIMER_STOPPED') {
+        // Cancela o setTimeout e fecha a notificação persistente
+        if (completionTimerId !== null) { clearTimeout(completionTimerId); completionTimerId = null; }
+        self.registration.getNotifications({ tag: 'ozplus-timer-active' })
+            .then(notifs => notifs.forEach(n => n.close()));
+
+    } else if (type === 'SCHEDULE_NOTIFICATION') {
+        // Compatibilidade com código anterior
+        if (completionTimerId !== null) { clearTimeout(completionTimerId); completionTimerId = null; }
+        const delay = endTime - Date.now();
+        if (delay > 0) {
+            completionTimerId = setTimeout(() => { completionTimerId = null; fireCompletionNotification(); }, delay);
+        } else {
             fireCompletionNotification();
-        }, delay);
+        }
 
     } else if (type === 'CANCEL_NOTIFICATION') {
-        if (pendingTimerId !== null) {
-            clearTimeout(pendingTimerId);
-            pendingTimerId = null;
-        }
+        if (completionTimerId !== null) { clearTimeout(completionTimerId); completionTimerId = null; }
     }
 });
 
 function fireCompletionNotification() {
-    self.registration.showNotification('WIER OZplus — Aplicação Concluída! ✅', {
-        body: 'O tempo programado terminou. Ventile o ambiente por pelo menos 10 minutos antes de entrar!',
-        requireInteraction: true,
-        vibrate: [200, 100, 200, 100, 200, 100, 600],
+    // Fecha a notificação "ativo" antes de mostrar a de conclusão
+    self.registration.getNotifications({ tag: 'ozplus-timer-active' })
+        .then(notifs => notifs.forEach(n => n.close()));
+
+    self.registration.showNotification('✅ WIER OZplus — Aplicação Concluída!', {
+        body: 'O tempo terminou. Ventile o ambiente por pelo menos 10 minutos antes de entrar!',
         tag: 'ozplus-timer-complete',
-        renotify: true
+        requireInteraction: true,
+        renotify: true,
+        vibrate: [200, 100, 200, 100, 200, 100, 600]
     });
 }
 
 self.addEventListener('notificationclick', event => {
     event.notification.close();
     event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true })
-            .then(windowClients => {
-                for (const client of windowClients) {
-                    if ('focus' in client) return client.focus();
-                }
-                return clients.openWindow('./ozplus.html');
-            })
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+            for (const c of list) if ('focus' in c) return c.focus();
+            return clients.openWindow('./ozplus.html');
+        })
     );
 });

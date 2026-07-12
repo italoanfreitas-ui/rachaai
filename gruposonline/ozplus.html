@@ -554,14 +554,14 @@
             }
         }
 
-        function scheduleSwNotification(endTime) {
+        function scheduleSwNotification(endTime, totalSeconds) {
             if (!swRegistration || !swRegistration.active) return;
-            swRegistration.active.postMessage({ type: 'SCHEDULE_NOTIFICATION', endTime });
+            swRegistration.active.postMessage({ type: 'TIMER_STARTED', endTime, totalSeconds });
         }
 
         function cancelSwNotification() {
             if (!swRegistration || !swRegistration.active) return;
-            swRegistration.active.postMessage({ type: 'CANCEL_NOTIFICATION' });
+            swRegistration.active.postMessage({ type: 'TIMER_STOPPED' });
         }
 
         // ────────────────────────────────────────────────────────
@@ -817,8 +817,8 @@
                 cancelSwNotification();
 
                 btn.innerText = 'Retomar';
-                btn.classList.replace('bg-rose-600', 'bg-cyan-600');
-                btn.classList.replace('hover:bg-rose-500', 'hover:bg-cyan-500');
+                btn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
+                btn.classList.add('bg-cyan-600', 'hover:bg-cyan-500');
                 status.innerText  = 'Pausado';
                 status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-950/40 text-amber-400 font-semibold border border-amber-800/30';
                 ring.classList.remove('timer-ring-active');
@@ -840,14 +840,14 @@
                 timerEndTime     = Date.now() + timerSeconds * 1000;
 
                 btn.innerText = 'Pausar';
-                btn.classList.replace('bg-cyan-600', 'bg-rose-600');
-                btn.classList.replace('hover:bg-cyan-500', 'hover:bg-rose-500');
+                btn.classList.remove('bg-cyan-600', 'hover:bg-cyan-500');
+                btn.classList.add('bg-rose-600', 'hover:bg-rose-500');
                 status.innerText  = 'Em Execução';
                 status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-400 font-semibold border border-emerald-800/30';
                 ring.classList.add('timer-ring-active');
 
                 // Agenda notificação via Service Worker (funciona com navegador minimizado no Android)
-                scheduleSwNotification(timerEndTime);
+                scheduleSwNotification(timerEndTime, timerTotalSeconds);
 
                 // Persiste estado para recuperação após reload
                 saveTimerState();
@@ -880,8 +880,8 @@
             const ring   = document.getElementById('timer-ring-container');
 
             btn.innerText = 'Iniciar Cronômetro';
-            btn.classList.replace('bg-rose-600', 'bg-cyan-600');
-            btn.classList.replace('hover:bg-rose-500', 'hover:bg-cyan-500');
+            btn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
+            btn.classList.add('bg-cyan-600', 'hover:bg-cyan-500');
             status.innerText  = 'Concluído ✓';
             status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold';
             ring.classList.remove('timer-ring-active');
@@ -942,8 +942,8 @@
                     const ring   = document.getElementById('timer-ring-container');
 
                     btn.innerText = 'Pausar';
-                    btn.classList.replace('bg-cyan-600', 'bg-rose-600');
-                    btn.classList.replace('hover:bg-cyan-500', 'hover:bg-rose-500');
+                    btn.classList.remove('bg-cyan-600', 'hover:bg-cyan-500');
+                    btn.classList.add('bg-rose-600', 'hover:bg-rose-500');
                     status.innerText  = 'Em Execução';
                     status.className  = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-400 font-semibold border border-emerald-800/30';
                     ring.classList.add('timer-ring-active');
@@ -988,14 +988,17 @@
 
             if (isAndroid) {
                 // Intent deep link para o app Relógio do Android
+                // i. = integer, B. = boolean, S. = string (prefixos obrigatórios)
                 const intentUrl =
                     `intent://timer#Intent;` +
                     `action=android.intent.action.SET_TIMER;` +
-                    `S.android.intent.extra.alarm.LENGTH=${seconds};` +
-                    `S.android.intent.extra.alarm.SKIP_UI=false;` +
+                    `i.android.intent.extra.alarm.LENGTH=${seconds};` +
+                    `B.android.intent.extra.alarm.SKIP_UI=false;` +
                     `S.android.intent.extra.alarm.MESSAGE=WIER%20OZplus%20%E2%80%94%20${minutes}%20min;` +
                     `end`;
-                window.location.href = intentUrl;
+                const a = document.createElement('a');
+                a.href = intentUrl;
+                a.click();
                 showNotification(`Abrindo Relógio com ${minutes} min...`, 'info');
             } else {
                 // iOS/desktop: fallback para calendário
@@ -1093,7 +1096,7 @@
             // Verifica se o app já estava cacheado (offline-ready)
             // Se sim, esconde o banner de "salvando para offline"
             if ('caches' in window) {
-                caches.has('ozplus-v2').then(exists => {
+                caches.has('ozplus-v3').then(exists => {
                     if (exists) {
                         const banner = document.getElementById('offline-info-card');
                         if (banner) banner.classList.add('hidden');
