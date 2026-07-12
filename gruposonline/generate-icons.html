@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Ícones — WIER OZplus</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 16px;
+            gap: 24px;
+        }
+        h2 { margin: 0; color: #06b6d4; font-size: 20px; }
+        p  { color: #94a3b8; font-size: 13px; text-align: center; margin: 0; }
+        canvas { border-radius: 20px; box-shadow: 0 4px 24px rgba(6,182,212,0.3); }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .btn:active { opacity: 0.8; }
+        .row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .box { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        code { background: #1e293b; padding: 3px 8px; border-radius: 5px; font-size: 12px; color: #06b6d4; }
+        .step { background: #1e293b; border-radius: 12px; padding: 16px 20px; max-width: 420px; font-size: 13px; color: #cbd5e1; line-height: 1.7; }
+        .step strong { color: #f1f5f9; }
+    </style>
+</head>
+<body>
+
+    <h2>🎨 Gerador de Ícones WIER OZplus</h2>
+    <p>Clique nos botões abaixo para baixar os dois ícones.<br>
+       Depois salve os arquivos na mesma pasta que o <code>ozplus.html</code>.</p>
+
+    <div class="row">
+        <div class="box">
+            <canvas id="c192" width="192" height="192"></canvas>
+            <button class="btn" style="background:#06b6d4; color:#0f172a;" onclick="download(192)">
+                ⬇ Baixar icon-192.png
+            </button>
+        </div>
+        <div class="box">
+            <canvas id="c512" width="512" height="512" style="width:192px;height:192px;"></canvas>
+            <button class="btn" style="background:#2563eb; color:white;" onclick="download(512)">
+                ⬇ Baixar icon-512.png
+            </button>
+        </div>
+    </div>
+
+    <div class="step">
+        <strong>Próximos passos após baixar os ícones:</strong><br>
+        1. Salve <code>icon-192.png</code> e <code>icon-512.png</code> na pasta <code>gruposonline/</code><br>
+        2. Faça o push para o GitHub (ou use outro método de hospedagem)<br>
+        3. Acesse <strong>pwabuilder.com</strong>, cole a URL do seu site e baixe o APK Android
+    </div>
+
+    <script>
+        function roundedRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function drawIcon(canvas) {
+            const s   = canvas.width;
+            const ctx = canvas.getContext('2d');
+            const sc  = s / 100; // fator de escala
+
+            // Fundo com gradiente cyan → azul
+            const grad = ctx.createLinearGradient(0, 0, s, s);
+            grad.addColorStop(0, '#06b6d4');
+            grad.addColorStop(1, '#2563eb');
+
+            roundedRect(ctx, 0, 0, s, s, s * 0.20);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            const cx = s / 2;
+            const cy = s / 2;
+
+            // ── Molécula O₃ ──
+
+            // Átomo superior (central, maior)
+            ctx.lineWidth   = sc * 2.2;
+            ctx.strokeStyle = 'white';
+            ctx.fillStyle   = 'rgba(255,255,255,0.22)';
+            ctx.beginPath();
+            ctx.arc(cx, cy - 22 * sc, 15 * sc, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Átomo inferior esquerdo
+            ctx.lineWidth   = sc * 1.8;
+            ctx.strokeStyle = 'rgba(186,230,253,0.95)';
+            ctx.fillStyle   = 'rgba(255,255,255,0.07)';
+            ctx.beginPath();
+            ctx.arc(cx - 20 * sc, cy + 16 * sc, 13 * sc, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Átomo inferior direito
+            ctx.beginPath();
+            ctx.arc(cx + 20 * sc, cy + 16 * sc, 13 * sc, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Ligações tracejadas
+            ctx.setLineDash([sc * 2, sc * 1.5]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            ctx.lineWidth   = sc * 1.5;
+
+            ctx.beginPath();
+            ctx.moveTo(cx - 8  * sc, cy - 8  * sc);
+            ctx.lineTo(cx - 15 * sc, cy + 4  * sc);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(cx + 8  * sc, cy - 8  * sc);
+            ctx.lineTo(cx + 15 * sc, cy + 4  * sc);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+
+            // Ponto de ressonância central
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.arc(cx, cy + 1 * sc, 5 * sc, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Brilho no átomo superior
+            ctx.fillStyle = 'rgba(255,255,255,0.45)';
+            ctx.beginPath();
+            ctx.arc(cx - 5 * sc, cy - 28 * sc, 4 * sc, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function download(size) {
+            const canvas = document.getElementById(`c${size}`);
+            const a      = document.createElement('a');
+            a.href       = canvas.toDataURL('image/png');
+            a.download   = `icon-${size}.png`;
+            a.click();
+        }
+
+        // Desenha previews ao carregar
+        window.onload = () => {
+            drawIcon(document.getElementById('c192'));
+            drawIcon(document.getElementById('c512'));
+        };
+    </script>
+</body>
+</html>
